@@ -52,6 +52,7 @@ export default defineConfig(async ({ command }) => {
   const { cloudflare } = await import("@cloudflare/vite-plugin");
 
   return {
+    resolve: { alias: { "@/lib/event-service": new URL("./lib/sites-event-service.ts", import.meta.url).pathname } },
     server: {
       ...(managedLinux
         ? { host: "0.0.0.0", allowedHosts: ["terminal.local"] }

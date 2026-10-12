@@ -42,3 +42,11 @@ The hosting manifest declares the D1 binding `DB`. Sites provisions D1 and appli
 - Powerboat courses and race instructions: https://cowestorquaycowes.com/courses/ and https://cowestorquaycowes.com/race-instructions/
 
 The application does not copy official participant data, logos, restricted tracks or race instructions.
+
+## Vercel deployment
+
+The same repository supports a native Next.js Vercel deployment. `pnpm build:vercel` builds it. The existing persistent D1 database remains behind the private Sites API; the Vercel server proxies requests securely and does not expose service credentials to the browser.
+
+Vercel production secrets: `EVENT_API_ORIGIN` (the private Sites origin) and `EVENT_API_TOKEN` (its supported service-access bearer token). Set these through Vercel environment settings, never source files. Keep Vercel Authentication enabled for **all deployments**, including production, because this is a private organiser workspace with crew contacts and write operations. Preview deployments do not receive production database credentials.
+
+Vinext builds resolve the event service to `lib/sites-event-service.ts`; Next.js builds use `lib/event-service.ts`. The UI and record models are shared across both hosts.
