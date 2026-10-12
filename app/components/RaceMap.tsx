@@ -81,7 +81,8 @@ export default function RaceMap({boats,tracks,selected,onSelect,progress,layer,z
       }else {item.marker.setLatLng(p.point);if(item.appearance!==appearance){item.marker.setIcon(icon);item.appearance=appearance;}}
       item.marker.setZIndexOffset(active?1000:0);
       const label=document.createElement('span');label.textContent=`${p.boat.data.name}${active?' · '+(p.recorded?'GPS':'demo'):''}`;
-      if(!item.marker.getTooltip())item.marker.bindTooltip(label,{permanent:true,direction:'right',offset:[13,0],className:'boat-map-label'});else item.marker.setTooltipContent(label);
+      const tooltip=item.marker.getTooltip();
+      if(!tooltip||tooltip.options.permanent!==active){if(tooltip)item.marker.unbindTooltip();item.marker.bindTooltip(label,{permanent:active,direction:'right',offset:[13,0],className:'boat-map-label'});}else item.marker.setTooltipContent(label);
       if(p.trail.length>1)L.polyline(p.trail,{color:p.boat.data.colour,weight:active?4:2,opacity:active?.9:.35,interactive:false}).addTo(e.trails);
     }
   },[ready,positions,selected]);
