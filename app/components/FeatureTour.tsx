@@ -55,15 +55,20 @@ export default function FeatureTour({ audience }: { audience: Audience }) {
     {open && <div className="feature-tour-scrim" onMouseDown={event => { if (event.target === event.currentTarget) setOpen(false); }}>
       <section className="feature-tour-dialog" role="dialog" aria-modal="true" aria-labelledby="feature-tour-title" aria-describedby="feature-tour-summary" data-audience={audience}>
         <button ref={close} className="feature-tour-close" type="button" onClick={() => setOpen(false)} aria-label="Close tour"><X size={19}/></button>
-        <div className="feature-tour-art" data-scene={current.scene} aria-hidden="true">
-          <div className="tour-art-sky"><span className="tour-art-sun"/></div>
-          <div className="tour-art-water"><i/><i/><i/><i/><i/><i/></div>
-          <div className="tour-art-route"><b/><b/><b/><b/></div>
-          <div className="tour-art-boat tour-art-boat-a"><span/></div>
-          <div className="tour-art-boat tour-art-boat-b"><span/></div>
-          <div className="tour-art-boat tour-art-boat-c"><span/></div>
-          <div className="tour-art-panel"><Icon size={15}/><span>{current.label}</span><small>{String(step + 1).padStart(2, '0')} / {String(slides.length).padStart(2, '0')}</small></div>
-          <span className="tour-art-compass"><Compass size={18}/></span>
+        <div key={current.scene} className="feature-tour-art" data-scene={current.scene} data-audience={audience} aria-hidden="true">
+          <div className="tour-art-photo"/>
+          <div className="tour-art-grade"/>
+          <div className="tour-art-topline"><span><i/> {audience === 'spectator' ? 'SOLENT RACE VIEW' : 'COWES RACE OFFICE'}</span><span>{audience === 'spectator' ? 'ISLE OF WIGHT' : 'EVENT CONTROL'}</span></div>
+          <svg className="tour-art-route" viewBox="0 0 450 430" preserveAspectRatio="none">
+            <path className="tour-route-halo" d="M34 299 C104 273 112 212 181 217 S271 260 293 188 S369 142 418 105"/>
+            <path className="tour-route-line" d="M34 299 C104 273 112 212 181 217 S271 260 293 188 S369 142 418 105"/>
+            <circle className="tour-waypoint" cx="34" cy="299" r="7"/><circle className="tour-waypoint" cx="181" cy="217" r="7"/><circle className="tour-waypoint" cx="293" cy="188" r="7"/><circle className="tour-waypoint" cx="418" cy="105" r="7"/>
+            <circle className="tour-route-vessel" r="7"><animateMotion dur={audience === 'spectator' ? '9s' : '12s'} repeatCount="indefinite" path="M34 299 C104 273 112 212 181 217 S271 260 293 188 S369 142 418 105"/></circle>
+          </svg>
+          <div className="tour-art-signal"><span className="tour-signal-ring"/><span className="tour-signal-ring"/><i/></div>
+          <div className="tour-art-top-card"><small>{audience === 'spectator' ? 'RACE DISPLAY' : 'OPERATIONS'}</small><strong>{current.label}</strong><span><i/> {audience === 'spectator' ? 'COURSE & FLEET' : 'RACE DAY WORKSPACE'}</span></div>
+          <div className="tour-art-glass"><span className="tour-glass-icon"><Icon size={15}/></span><div><small>FEATURE {String(step + 1).padStart(2, '0')} <i>•</i> {audience === 'spectator' ? 'SPECTATOR' : 'RACE TEAM'}</small><strong>{current.label}</strong></div><span className="tour-art-step">{String(step + 1).padStart(2, '0')}<i>/</i>{String(slides.length).padStart(2, '0')}</span></div>
+          <div className="tour-art-readouts">{(audience === 'spectator' ? [['TRACK', 'FLEET VIEW'], ['COURSE', 'MARKS'], ['REPLAY', 'RACE STORY']] : [['PROGRAMME', 'STARTS'], ['FLEET', 'READINESS'], ['PUBLISH', 'PUBLIC VIEW']]).map((item, index) => <span key={item[0]} className={index === step % 3 ? 'active' : ''}><i>{String(index + 1).padStart(2, '0')}</i><b>{item[0]}</b><small>{item[1]}</small></span>)}</div>
         </div>
         <div className="feature-tour-body">
           <p className="feature-tour-eyebrow"><span/> {audience === 'spectator' ? 'COWES WEEK LIVE' : 'RACE OFFICE'} <i>•</i> A QUICK TOUR</p>
