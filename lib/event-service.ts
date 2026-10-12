@@ -1,4 +1,4 @@
-import { get,put,BlobPreconditionFailedError } from '@vercel/blob';
+import { get,put,head,BlobPreconditionFailedError } from '@vercel/blob';
 import { applyOperations,validateSnapshot,EventError,type EventState } from './event-state';
 // Vercel Authentication protects all deployment URLs. Private Blob objects are
 // read only by this server, with project-scoped OIDC; credentials never enter the UI.
@@ -8,7 +8,7 @@ function ensureConfigured(){
  if(process.env.VERCEL_ENV==='preview')throw new EventError('Preview builds do not use production event records.',503);
  if(!process.env.BLOB_STORE_ID&&!process.env.BLOB_READ_WRITE_TOKEN)throw new EventError('The private event record store is not configured.',503);
 }
-async function readStore():Promise<{state:EventState,etag:string}> {
+async function readStore(forWrite=false):Promise<{state:EventState,etag:string}> {
  ensureConfigured();
  let file=await get(pathname,{access:'private',useCache:false,abortSignal:AbortSignal.timeout(25000)});
  if(!file){
@@ -19,6 +19,15 @@ async function readStore():Promise<{state:EventState,etag:string}> {
   file=await get(pathname,{access:'private',useCache:false,abortSignal:AbortSignal.timeout(25000)});
  }
  if(!file||file.statusCode!==200)throw new EventError('Unable to read event records.',503);
+ if(forWrite){
+  // Use the canonical storage ETag from the control-plane metadata. HTTP GET
+  // representations can have a CDN/compression ETag that cannot guard a write.
+  const before=await head(pathname,{abortSignal:AbortSignal.timeout(25000)});
+  const fresh=await get(pathname,{access:'private',useCache:false,abortSignal:AbortSignal.timeout(25000)});
+  const after=await head(pathname,{abortSignal:AbortSignal.timeout(25000)});
+  if(!fresh||fresh.statusCode!==200||before.etag!==after.etag)throw new EventError('Another edit was saved while loading this record. Refresh and retry.',409);
+  return {state:validateSnapshot(await new Response(fresh.stream).json()),etag:after.etag};
+ }
  return {state:validateSnapshot(await new Response(file.stream).json()),etag:file.blob.etag};
 }
 function publicState(state:EventState){return {records:state.records,audit:state.audit.slice(0,60)};}
@@ -34,7 +43,7 @@ export async function POST(request:Request){
   if(Number(request.headers.get('content-length')||0)>2000000)return json({error:'Import exceeds 2 MB'},413);
   const raw=await request.text();if(raw.length>2000000)return json({error:'Import exceeds 2 MB'},413);
   let body:unknown;try{body=JSON.parse(raw);}catch{return json({error:'Invalid request JSON'},400);}
-  const current=await readStore();const next=applyOperations(current.state,body);
+  const current=await readStore(true);const next=applyOperations(current.state,body);
   const serialised=JSON.stringify(next);if(serialised.length>4000000)throw new EventError('The record store exceeds the current 4 MB limit. Export the records before adding more.',413);
   // Conditional writes are atomic at the object store. Stale concurrent writes
   // fail with 409 rather than dropping someone else's update or its audit entry.
