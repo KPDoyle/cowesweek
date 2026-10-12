@@ -137,3 +137,92 @@
 @media(max-width:780px){.feature-tour-art{min-height:160px}.tour-art-topline{top:11px;left:12px;right:12px;font-size:6px}.tour-art-top-card{top:38px;left:12px;width:155px;padding:8px 10px;gap:3px}.tour-art-top-card small,.tour-art-top-card>span{font-size:6px}.tour-art-top-card strong{font-size:10px}.tour-art-route{inset:-8% 0 0;height:115%}.tour-art-signal{left:60%;top:25%;width:45px;height:45px}.tour-art-glass{left:12px;bottom:10px;max-width:calc(100% - 164px);gap:6px;padding:7px 8px}.tour-glass-icon{width:23px;height:23px}.tour-art-glass>div small{font-size:5px}.tour-art-glass>div strong{font-size:8px}.tour-art-step{font-size:7px}.tour-art-readouts{right:12px;bottom:9px;width:125px;display:grid;grid-template-columns:repeat(3,minmax(0,1fr));gap:3px}.tour-art-readouts>span{grid-template-columns:1fr;grid-template-rows:auto auto auto;gap:2px;padding:4px 3px;text-align:center}.tour-art-readouts>span>i{display:none}.tour-art-readouts>span>b{font-size:5px}.tour-art-readouts>span>small{font-size:4px}.tour-art-readouts>span.active{transform:translateY(-3px)}}
 @media(max-width:540px){.feature-tour-art{min-height:140px}.tour-art-topline{top:9px}.tour-art-top-card{top:32px}.tour-art-readouts{bottom:6px}.tour-art-glass{bottom:7px}}
 @media(prefers-reduced-motion:reduce){.feature-tour-art,.tour-art-photo,.tour-art-route,.tour-route-line,.tour-route-vessel,.tour-art-signal>i,.tour-signal-ring,.tour-art-topline i,.tour-art-top-card,.tour-art-glass,.tour-art-readouts>span{animation:none!important;transition:none!important}.tour-art-photo{transform:scale(1.05)}}
+
+/* Cowes Week visual finish: chartroom blue, sea glass and island sunshine */
+:root{--ink:#102e50;--ink-dark:#081e3b;--teal:#1763db;--muted:#5d718c;--line:#dbe4ec;--paper:#f4f7fb;--coral:#e66b4e;--sunshine:#ffdc52;--sea-glass:#d8ede8;--cw-shadow:0 12px 34px #0b2c4b0d;--cw-shadow-strong:0 18px 42px #0b2c4b16}
+body{background:var(--paper);color:var(--ink);text-rendering:optimizeLegibility;-webkit-font-smoothing:antialiased}
+.topbar,.viewer-header{position:sticky;top:0;z-index:90;background:#fffdf8ed;backdrop-filter:blur(16px) saturate(145%);box-shadow:0 5px 20px #0b2c4b0a;border-bottom-color:#dce5ed}
+.topbar{height:82px;padding-inline:clamp(20px,3vw,44px)}
+.viewer-header{height:80px}
+.topbar nav button,.viewer-header nav>button{font-weight:550}
+.topbar nav button.selected{font-weight:750}
+.topbar nav button.selected:after,.viewer-header nav>button.active{color:#155e8c;border-color:#155e8c}
+.top-actions,.viewer-header .office-link{gap:10px}
+.private-pill{background:#f8fbfa}
+.viewer-brand>span{color:#102e50}
+.viewer-brand strong{color:#3c6485}
+.island-hero{border-radius:22px 22px 64px 22px;box-shadow:var(--cw-shadow-strong);background:#0b2d50}
+.hero-photo{filter:saturate(1.04) contrast(1.02);animation:hero-reveal .7s ease-out,island-photo-drift 34s 1s ease-in-out infinite alternate}
+.hero-shade{background:linear-gradient(90deg,#061e42f0 0%,#061e42b7 34%,#061e4217 70%),linear-gradient(0deg,#061e42c2,transparent 40%)}
+.hero-kicker{letter-spacing:2.2px}
+.hero-content h1{text-wrap:balance}
+.hero-description{max-width:390px}
+.btn.sunshine{box-shadow:0 7px 20px #f0cc6230;font-weight:750}
+.island-stamp{padding:10px 12px;border:1px solid #ffffff3b;border-radius:12px;background:#0b2d5044;backdrop-filter:blur(9px)}
+.island-ribbon{border-bottom-color:#d9e4eb}
+.ribbon-wave{box-shadow:0 6px 16px #d5aa2429}
+main{padding-top:26px}
+.page-heading{margin-bottom:28px}
+.page-heading h1,.page-heading h2{letter-spacing:-1.65px}
+.eyebrow,.panel-heading .eyebrow{font-weight:800}
+.event-switch{box-shadow:inset 0 1px 2px #15365c0a}
+.event-switch button.chosen{box-shadow:0 4px 11px #1763db30}
+.demo-label{font-weight:650}
+.panel,.condition-strip,.viewer-conditions,.viewer-map-card,.viewer-leaderboard,.viewer-panel,.race-story-feed,.coverage-card,.analysis-panel{box-shadow:var(--cw-shadow)}
+.panel{border-radius:15px;border-color:#dce5ed}
+.panel .panel-heading{margin-bottom:24px}
+.condition-strip{border-radius:16px;border-color:#dce5ed}
+.btn.primary{background:linear-gradient(135deg,#1763db,#1154b9);box-shadow:0 5px 15px #1763db27}
+.btn.primary:hover{background:linear-gradient(135deg,#2675e8,#155bbf);box-shadow:0 8px 20px #1763db38;transform:translateY(-2px)}
+.btn.secondary{background:#fff;border-color:#d7e1eb}
+.btn.secondary:hover{background:#f1f6fb;border-color:#bdcfdf;transform:translateY(-1px)}
+.viewer-main{padding-top:27px}
+.viewer-hero{position:relative;isolation:isolate;min-height:220px;border-radius:20px 20px 58px 20px;box-shadow:var(--cw-shadow-strong);background-size:cover;animation:cw-viewer-drift 34s ease-in-out infinite alternate}
+.viewer-hero:after{content:"";position:absolute;z-index:0;inset:0;border-radius:inherit;pointer-events:none;background:linear-gradient(116deg,transparent 57%,#ffffff0a 61%,transparent 68%),linear-gradient(0deg,#061c382c,transparent 54%)}
+.viewer-hero>div{position:relative;z-index:1}
+.viewer-hero h1{font-size:clamp(34px,3.2vw,46px);line-height:1.06;letter-spacing:-2px;text-wrap:balance}
+.viewer-hero .eyebrow{font-weight:800;letter-spacing:1.7px}
+.viewer-hero p:not(.eyebrow){max-width:570px}
+.viewer-hero-stamp{padding:10px 13px;border:1px solid #ffffff42;border-radius:12px;background:#071e3a45;backdrop-filter:blur(8px)}
+.viewer-hero-stamp img{width:51px}
+.viewer-conditions{border-color:#dce5ed;box-shadow:var(--cw-shadow);border-radius:15px;padding-block:19px}
+.viewer-conditions>div{min-height:40px}
+.viewer-conditions svg{color:#1763db}
+.viewer-conditions small{font-weight:750}
+.viewer-conditions strong{font-family:Manrope,var(--font);font-weight:800;letter-spacing:-.25px}
+.viewer-racebar{gap:18px}
+.viewer-racebar select,.analysis-heading select,.viewer-panel select{border-color:#d6e1ec;box-shadow:0 2px 5px #0b2c4b06;transition:border-color .18s,box-shadow .18s}
+.viewer-racebar select:focus,.analysis-heading select:focus,.viewer-panel select:focus{border-color:#5988b7;box-shadow:0 0 0 3px #1763db1a;outline:0}
+.viewer-map-card,.viewer-leaderboard,.viewer-panel,.race-story-feed,.coverage-card,.analysis-panel{border-color:#dce5ed}
+.viewer-map-card{border-radius:17px}
+.viewer-mapbar{background:linear-gradient(180deg,#fff,#fbfcfe)}
+.view-switch>button{border-radius:8px;font-weight:600}
+.view-switch>button.active{background:#eaf2fc;color:#155e8c;box-shadow:inset 0 0 0 1px #dce8f5}
+.viewer-map-tools{box-shadow:0 8px 24px #09274625;backdrop-filter:blur(12px)}
+.viewer-map-tools>button:hover{background:#edf4fb;color:#155e8c}
+.viewer-clock{background:linear-gradient(180deg,#fff,#f8fafd);border-top:1px solid #e4eaf0}
+.viewer-clock>button:first-child{box-shadow:0 3px 10px #1763db22}
+.viewer-clock input{accent-color:#1763db}
+.event-timeline{border-color:#cbd8e4}
+.viewer-leaderboard{border-radius:17px}
+.leaderboard-title h2{font-weight:800}
+.viewer-ranking-list{scrollbar-color:#b8c9d8 transparent;scrollbar-width:thin}
+.viewer-ranking-row{transition:background .2s,border-color .2s,transform .2s}
+.viewer-ranking-row:hover{background:#f3f7fc;transform:translateX(2px)}
+.viewer-ranking-row.selected{background:linear-gradient(90deg,#e7f0fc,#f4f8fd);box-shadow:inset 3px 0 #1763db}
+.ranking-place{font-weight:750}
+.viewer-spotlight{background:linear-gradient(180deg,#f8fbfe,#fff)}
+.shore-viewpoint{border-radius:17px;background:linear-gradient(150deg,#f1f6fc,#eaf2fa);box-shadow:0 6px 20px #0b2c4b08;transition:transform .25s,box-shadow .25s,border-color .25s}
+.shore-viewpoint:hover{transform:translateY(-4px);box-shadow:var(--cw-shadow-strong);border-color:#b8cde0}
+.public-media{border-color:#dce5ed;border-radius:15px;box-shadow:0 6px 20px #0b2c4b07;transition:transform .25s,box-shadow .25s}
+.public-media:hover{transform:translateY(-3px);box-shadow:var(--cw-shadow)}
+.feature-tour-trigger{box-shadow:0 3px 10px #0b2c4b0a}
+.feature-tour-trigger:hover{box-shadow:0 7px 17px #0b2c4b16}
+.feature-tour-dialog{box-shadow:0 30px 100px #06182770}
+.feature-tour-art{box-shadow:inset -1px 0 #ffffff2b}
+@keyframes island-photo-drift{from{object-position:48% 50%}to{object-position:54% 50%}}
+@keyframes cw-viewer-drift{from{background-position:46% 50%}to{background-position:56% 50%}}
+@media(max-width:1000px){.topbar{height:74px}.viewer-header{height:75px}.viewer-hero{min-height:210px}}
+@media(max-width:800px){.topbar,.viewer-header{box-shadow:0 4px 16px #0b2c4b0c}.island-hero{border-radius:18px 18px 44px 18px}}
+@media(max-width:600px){.viewer-header{height:73px}.viewer-hero{min-height:190px;border-radius:17px 17px 38px 17px;padding:24px 20px}.viewer-hero h1{font-size:clamp(29px,8vw,36px);letter-spacing:-1.3px}.viewer-hero-stamp{gap:7px;padding:7px 9px}.viewer-hero-stamp img{width:40px}.viewer-conditions{padding:16px 12px}}
+@media(prefers-reduced-motion:reduce){.hero-photo,.viewer-hero{animation:none!important}.shore-viewpoint,.public-media,.viewer-ranking-row,.btn{transition:none!important}}
