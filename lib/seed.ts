@@ -1,6 +1,6 @@
 import { type Entry, type Kind } from './model';
 export const seed:Entry[]=[];
-function add(kind:Kind,id:string,data:unknown){seed.push({id,kind,data:data as Entry['data'],version:1,updatedAt:'2026-08-01T09:00:00Z'});}
+function add(kind:Kind,id:string,data:unknown){seed.push({id,kind,data:data as Entry['data'],version:1,updatedAt:'2026-08-01T09:00:00Z'} as Entry);}
 add('event','sailing-event',{name:'Cowes Week',discipline:'sailing',organiser:'Regatta race office',description:'Multi-class sailing • Demonstration programme'});
 add('event','power-event',{name:'Cowes Powerboat Festival',discipline:'powerboat',organiser:'Powerboat race office',description:'Offshore and circuit racing • Demonstration programme'});
 const colours=['#ff644a','#287eec','#8d68d8','#e3b23c','#1d9888','#e685a5','#44739b','#90a13e'];

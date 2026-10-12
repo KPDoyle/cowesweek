@@ -8,7 +8,7 @@ function ensureConfigured(){
  if(process.env.VERCEL_ENV==='preview')throw new EventError('Preview builds do not use production event records.',503);
  if(!process.env.BLOB_STORE_ID&&!process.env.BLOB_READ_WRITE_TOKEN)throw new EventError('The private event record store is not configured.',503);
 }
-async function readStore(forWrite=false):Promise<{state:EventState,etag:string}> {
+export async function readStore(forWrite=false):Promise<{state:EventState,etag:string}> {
  ensureConfigured();
  let file=await get(pathname,{access:'private',useCache:false,abortSignal:AbortSignal.timeout(25000)});
  if(!file){
@@ -36,8 +36,9 @@ function failure(e:unknown){
  if(e instanceof BlobPreconditionFailedError)return json({error:'Another edit was saved at the same time. Refresh and retry.'},409);
  console.error('Private event store request failed',e instanceof Error?e.name:'UnknownError');return json({error:'Unable to access saved event records. Please retry.'},503);
 }
-export async function GET(){try{return json(publicState((await readStore()).state));}catch(e){return failure(e);}}
+export async function GET(){if(process.env.COWES_PUBLIC_ONLY==='1')return json({error:'Organiser access is unavailable on the public site.'},403);try{return json(publicState((await readStore()).state));}catch(e){return failure(e);}}
 export async function POST(request:Request){
+ if(process.env.COWES_PUBLIC_ONLY==='1')return json({error:'This site is read-only.'},403);
  try{
   const origin=request.headers.get('origin');if(origin&&origin!==new URL(request.url).origin)return json({error:'Origin not allowed'},403);
   if(Number(request.headers.get('content-length')||0)>2000000)return json({error:'Import exceeds 2 MB'},413);

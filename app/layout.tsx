@@ -3,6 +3,8 @@ import "./globals.css";
 import "leaflet/dist/leaflet.css";
 import "./island.css";
 import "./race-map.css";
+import "maplibre-gl/dist/maplibre-gl.css";
+import "./spectator.css";
 
 export const metadata: Metadata = {
   title: "Cowes Week Live | Sailing & Powerboat Race Centre",
