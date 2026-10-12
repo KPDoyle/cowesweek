@@ -1,6 +1,8 @@
 import type { Metadata } from "next";
 import "./globals.css";
+import "leaflet/dist/leaflet.css";
 import "./island.css";
+import "./race-map.css";
 
 export const metadata: Metadata = {
   title: "Cowes Week Live | Sailing & Powerboat Race Centre",

@@ -1,38 +1,107 @@
 'use client';
-import { type Entry } from '@/lib/model';
-export default function RaceMap({boats,tracks,selected,onSelect,progress,layer,zoom,discipline}:{boats:Entry<'boat'>[],tracks:Entry<'track'>[],selected:string,onSelect:(id:string)=>void,progress:number,layer:string,zoom:number,discipline:string}){
- const project=(lat:number,lon:number)=>discipline==='powerboat'?{x:75+(lon+3.8)/2.6*810,y:335-(lat-50.35)/.65*260}:{x:70+(lon+1.58)/.52*790,y:510-(lat-50.65)/.22*420};
- function position(b:Entry<'boat'>,i:number){const points=tracks.filter(t=>t.data.boatId===b.id).sort((a,b)=>a.data.time.localeCompare(b.data.time));if(points.length){const point=points[Math.min(points.length-1,Math.floor(progress/100*(points.length-1)))];return project(point.data.lat,point.data.lon);}return {x:250+((i*91+progress*(discipline==='powerboat'?5:2.3))%460),y:205+Math.sin((i*1.3+progress/23))*70+i*17};}
- return <svg className="race-map" viewBox="0 0 960 570" role="img" aria-label={`${discipline==='powerboat'?'South coast':'Solent'} illustrative race tracking map`}>
- <defs><pattern id="sea-grid" width="48" height="48" patternUnits="userSpaceOnUse"><path d="M48 0H0V48" fill="none" stroke="#b3c6c9" strokeWidth=".5" opacity=".4"/></pattern><pattern id="land-grid" width="8" height="8" patternUnits="userSpaceOnUse"><path d="M0 8L8 0" stroke="#d8dbd1" strokeWidth=".5"/></pattern><linearGradient id="sea" x2="1" y2="1"><stop stopColor="#e7f1f1"/><stop offset="1" stopColor="#d6e6e7"/></linearGradient><filter id="shadow"><feDropShadow dx="0" dy="2" stdDeviation="3" floodOpacity=".16"/></filter></defs>
- <rect width="960" height="570" fill="url(#sea)"/><rect width="960" height="570" fill="url(#sea-grid)"/>
- {[0,1,2,3].map(i=><path key={i} d={`M-20 ${195+i*25} Q220 ${100+i*35} 440 ${185+i*27} T1000 ${160+i*25}`} stroke="#c4d8da" strokeWidth="1" fill="none"/>)}
- {discipline==='sailing'?<>
- <path d="M0 0H960V120L905 143L870 120L835 152L815 116L766 157L735 140L690 142L649 177L610 149L586 175L535 136L520 105L491 106L468 171L442 166L434 135L390 122L344 150L326 133L295 163L270 161L232 182L205 170L190 192L163 184L149 205L104 200L88 220L36 216L0 242Z" fill="#f1f1e8" stroke="#a7b5a8" strokeWidth="1.3"/>
- <path d="M116 570L165 506L182 476L213 457L220 438L247 422L261 397L295 383L324 361L372 349L388 327L437 315L465 308L500 315L508 359L523 391L552 372L559 347L582 333L624 344L648 328L680 344L710 347L734 369L789 379L826 413L861 452L913 467L960 506V570Z" fill="#f1f1e8" stroke="#a7b5a8" strokeWidth="1.3"/>
- <path d="M235 510Q420 388 457 397T818 453" fill="none" stroke="#dfcbbb" strokeWidth="3"/><path d="M90 90Q270 190 399 91T890 90" fill="none" stroke="#dfcbbb" strokeWidth="3"/>
- <text x="240" y="90" className="map-label">HAMPSHIRE</text><text x="486" y="488" className="map-label">ISLE OF WIGHT</text><text x="180" y="326" className="water-label" transform="rotate(-15 180 326)">WEST SOLENT</text><text x="714" y="264" className="water-label">EAST SOLENT</text>
- <g className="town"><circle cx="490" cy="317" r="4"/><text x="480" y="342">COWES</text><text x="295" y="416">Yarmouth</text><text x="195" y="193">Lymington</text><text x="795" y="136">Portsmouth</text><text x="820" y="389">Ryde</text><text x="515" y="80">Southampton</text></g>
- <path d="M490 305L272 267L649 211L743 329L490 305" className="course-line"/>
- {[[490,305],[272,267],[649,211],[743,329]].map(([x,y],i)=><g key={i}><circle cx={x} cy={y} r="9" fill={i?'#fff':'#123d43'} stroke="#123d43" strokeWidth="2"/><text x={x} y={y+4} textAnchor="middle" fill={i?'#123d43':'white'} fontSize="10" fontWeight="700">{i||'S'}</text></g>)}
- </>:<>
- <path d="M0 0H960V178L892 167L861 201L806 173L763 215L729 192L690 229L661 194L618 209L581 178L550 192L522 171L480 199L455 236L433 202L401 215L375 249L345 230L319 268L284 234L265 277L224 255L207 296L185 273L146 300L113 263L89 297L76 356L40 379L0 360Z" fill="#f1f1e8" stroke="#a7b5a8" strokeWidth="1.3"/>
- <path d="M780 263L839 235L875 254L899 292L855 311L810 295Z" fill="#f1f1e8" stroke="#a7b5a8"/>
- <text x="180" y="130" className="map-label">DEVON</text><text x="473" y="113" className="map-label">DORSET</text><text x="735" y="120" className="map-label">HAMPSHIRE</text><text x="410" y="420" className="water-label">ENGLISH CHANNEL</text>
- <g className="town"><text x="71" y="350">Torquay</text><text x="340" y="250">Portland</text><text x="575" y="203">Poole</text><text x="813" y="236">Cowes</text></g>
- <path d="M843 235L604 252L355 324L108 363L355 344L604 278L843 235" className="course-line"/>
- {[[843,235],[604,252],[108,363]].map(([x,y],i)=><g key={i}><circle cx={x} cy={y} r="9" fill={i?'white':'#123d43'} stroke="#123d43" strokeWidth="2"/><text x={x} y={y+4} textAnchor="middle" fill={i?'#123d43':'white'} fontSize="10">{i||'S'}</text></g>)}
- </>}
- {layer==='wind' && [1,2,3,4,5,6].map(i=><g key={i} transform={`translate(${i*138-50} ${190+(i%2)*100}) rotate(42)`} opacity=".3"><path d="M0 0V45M-7 8L0 0L7 8" fill="none" stroke="#187c85" strokeWidth="2"/></g>)}
- {layer==='tide' && [1,2,3,4,5].map(i=><g key={i} transform={`translate(${i*170-85} ${320-(i%2)*100})`} opacity=".35"><path d="M0 0H65L55 -7M65 0L55 7" fill="none" stroke="#4386a2" strokeWidth="2"/></g>)}
- <g transform={`translate(${480-480*zoom} ${280-280*zoom}) scale(${zoom})`}>
- {boats.map((b,i)=>{const p=position(b,i);const pts=tracks.filter(t=>t.data.boatId===b.id).sort((a,b)=>a.data.time.localeCompare(b.data.time));return <g key={b.id}>
- {selected===b.id?<path d={pts.length?pts.slice(0,Math.max(1,Math.ceil(progress/100*pts.length))).map((t,n)=>{const pos=project(t.data.lat,t.data.lon);return `${n?'L':'M'}${pos.x} ${pos.y}`;}).join(' '):`M${p.x-100} ${p.y+35}Q${p.x-50} ${p.y+45} ${p.x} ${p.y}`} fill="none" stroke={b.data.colour} strokeWidth="2.5" opacity=".65"/>:null}
- <g role="button" tabIndex={0} aria-label={`Follow ${b.data.name}`} onClick={()=>onSelect(b.id)} onKeyDown={e=>{if(e.key==='Enter'||e.key===' ')onSelect(b.id);}} className="boat-marker" transform={`translate(${p.x} ${p.y})`}>
- {selected===b.id?<circle r="21" fill={b.data.colour} opacity=".16"/>:null}<path d={discipline==='powerboat'?'M0 -14L8 5L5 11H-5L-8 5Z':'M0 -14L7 4L4 10H-4L-7 4Z'} fill={b.data.colour} stroke="#fff" strokeWidth="2" filter="url(#shadow)"/>
- {selected===b.id || zoom>1?<g><rect x="13" y="-14" width="126" height="27" rx="5" fill="white" filter="url(#shadow)"/><text x="22" y="4" fontSize="11" fill="#16363c" fontWeight="600">{b.data.name}</text></g>:null}
- </g></g>;})}</g>
- <g transform="translate(900 465)"><circle r="30" fill="white" fillOpacity=".75"/><path d="M0 -23L7 9L0 4L-7 9Z" fill="#294b50"/><text y="-34" textAnchor="middle" fontSize="10" fill="#294b50">N</text></g>
- <text x="23" y="541" fontSize="10" fill="#607b80">ILLUSTRATIVE MAP • NOT FOR NAVIGATION</text>
- </svg>;
+import { useEffect, useMemo, useRef, useState } from 'react';
+import type * as Leaflet from 'leaflet';
+import { demoCourse, simulatedPosition, type Position } from '@/lib/race-geometry';
+import type { Entry } from '@/lib/model';
+
+type Props = { boats: Entry<'boat'>[]; tracks: Entry<'track'>[]; selected: string; onSelect: (id:string)=>void; progress:number; layer:string; zoom:number; onZoomChange:(zoom:number)=>void; resetKey:number; raceId:string; discipline:string };
+type Engine = { L:typeof Leaflet; map:Leaflet.Map; course:Leaflet.LayerGroup; trails:Leaflet.LayerGroup; weather:Leaflet.LayerGroup; nautical:Leaflet.TileLayer; markers:Map<string,{marker:Leaflet.Marker; appearance:string}> };
+const tileUrl=process.env.NEXT_PUBLIC_MAP_TILE_URL||'https://tile.openstreetmap.org/{z}/{x}/{y}.png';
+const seamarkUrl=process.env.NEXT_PUBLIC_SEAMARK_TILE_URL||'https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png';
+function coordinate(n:number,positive:string,negative:string){return `${Math.abs(n).toFixed(4)}° ${n>=0?positive:negative}`;}
+
+export default function RaceMap({boats,tracks,selected,onSelect,progress,layer,zoom,onZoomChange,resetKey,raceId,discipline}:Props){
+  const host=useRef<HTMLDivElement>(null),engine=useRef<Engine|null>(null);
+  const onSelectRef=useRef(onSelect),onZoomRef=useRef(onZoomChange);
+  const [ready,setReady]=useState(false),[mapError,setMapError]=useState(''),[tileError,setTileError]=useState(false),[seamarkError,setSeamarkError]=useState(false),[seamarks,setSeamarks]=useState(true);
+  const course=useMemo(()=>demoCourse(discipline,raceId),[discipline,raceId]);
+  const reports=useMemo(()=>{const grouped=new Map<string,Entry<'track'>[]>();for(const t of tracks){const list=grouped.get(t.data.boatId)||[];list.push(t);grouped.set(t.data.boatId,list);}for(const list of grouped.values())list.sort((a,b)=>a.data.time.localeCompare(b.data.time));return grouped;},[tracks]);
+  const positions=useMemo(()=>boats.map((boat,i)=>{const list=reports.get(boat.id)||[];if(list.length){const index=Math.min(list.length-1,Math.floor(progress/100*(list.length-1))),report=list[index];return {boat,point:[report.data.lat,report.data.lon] as Position,heading:report.data.heading,trail:list.slice(0,index+1).map(t=>[t.data.lat,t.data.lon] as Position),recorded:true};}return {boat,...simulatedPosition(course.points,progress,i),recorded:false};}),[boats,reports,progress,course]);
+  const spotlight=positions.find(p=>p.boat.id===selected);
+  useEffect(()=>{onSelectRef.current=onSelect;onZoomRef.current=onZoomChange;},[onSelect,onZoomChange]);
+
+  useEffect(()=>{
+    let disposed=false;let resize:ResizeObserver|undefined;
+    void (async()=>{
+      try {
+        const module=await import('leaflet');const L=module.default??module;
+        if(disposed||!host.current)return;
+        const map=L.map(host.current,{zoomControl:false,minZoom:6,maxZoom:18,scrollWheelZoom:false,attributionControl:true});
+        map.attributionControl.setPrefix(false);
+        // Browser requests preserve Referer and HTTP cache behaviour; only the visible viewport is loaded.
+        const tiles=L.tileLayer(tileUrl,{maxZoom:18,keepBuffer:1,updateWhenIdle:true,attribution:'© <a href="https://www.openstreetmap.org/copyright" target="_blank" rel="noreferrer">OpenStreetMap</a> contributors'}).addTo(map);
+        tiles.on('tileerror',()=>{if(!disposed)setTileError(true);});
+        tiles.on('loading',()=>{if(!disposed)setTileError(false);});
+        const nautical=L.tileLayer(seamarkUrl,{maxNativeZoom:18,maxZoom:18,keepBuffer:1,updateWhenIdle:true,attribution:'Seamarks © <a href="https://www.openseamap.org/" target="_blank" rel="noreferrer">OpenSeaMap</a> · <a href="https://creativecommons.org/licenses/by-sa/2.0/" target="_blank" rel="noreferrer">CC BY-SA</a>'});
+        nautical.on('tileerror',()=>{if(!disposed)setSeamarkError(true);});
+        nautical.on('loading',()=>{if(!disposed)setSeamarkError(false);});
+        L.control.scale({position:'bottomleft',imperial:false,maxWidth:100}).addTo(map);
+        map.on('zoomend',()=>onZoomRef.current(map.getZoom()));
+        engine.current={L,map,nautical,course:L.layerGroup().addTo(map),trails:L.layerGroup().addTo(map),weather:L.layerGroup().addTo(map),markers:new Map()};
+        map.setView([50.79,-1.32],11);
+        resize=new ResizeObserver(()=>map.invalidateSize({pan:false}));resize.observe(host.current);
+        setReady(true);
+      }catch {if(!disposed)setMapError('The map could not load. Refresh to try again.');}
+    })();
+    return ()=>{disposed=true;resize?.disconnect();engine.current?.map.remove();engine.current=null;};
+  },[]);
+
+  useEffect(()=>{
+    const e=engine.current;if(!ready||!e)return;
+    e.map.fitBounds(course.bounds,{paddingTopLeft:[35,70],paddingBottomRight:[45,90],maxZoom:course.offshore?9:12,animate:false});
+  },[ready,course,resetKey]);
+  useEffect(()=>{const map=engine.current?.map;if(ready&&map&&map.getZoom()!==zoom)map.setZoom(zoom);},[ready,zoom]);
+  useEffect(()=>{const e=engine.current;if(!ready||!e)return;if(seamarks)e.nautical.addTo(e.map);else e.nautical.remove();},[ready,seamarks]);
+
+  useEffect(()=>{
+    const e=engine.current;if(!ready||!e)return;const {L}=e;e.course.clearLayers();
+    L.polyline(course.points,{color:'#fff',weight:6,opacity:.85,interactive:false}).addTo(e.course);
+    L.polyline(course.points,{color:'#1763db',weight:3,dashArray:'9 7',opacity:.85,interactive:false}).addTo(e.course);
+    course.marks.forEach((mark,i)=>{
+      const label=document.createElement('span');label.textContent=mark.label;
+      L.circleMarker(mark.point,{radius:8,color:'#122b50',weight:2,fillColor:i?'#ffdc52':'#122b50',fillOpacity:1}).bindTooltip(label,{permanent:true,direction:i?'bottom':'top',className:'course-mark-label',offset:[0,i?9:-9]}).addTo(e.course);
+    });
+  },[ready,course]);
+
+  useEffect(()=>{
+    const e=engine.current;if(!ready||!e)return;const {L}=e;e.trails.clearLayers();
+    const ids=new Set(positions.map(p=>p.boat.id));
+    for(const [id,item] of e.markers)if(!ids.has(id)){item.marker.remove();e.markers.delete(id);}
+    for(const p of positions){
+      const active=p.boat.id===selected;
+      const appearance=`${active}-${p.boat.data.colour}-${p.boat.data.name}-${Math.round(p.heading)}`;
+      const shape=p.boat.data.discipline==='powerboat'?'M16 4 25 30 22 38H10L7 30Z':'M16 3 24 29 21 38H11L8 29Z';
+      const icon=L.divIcon({className:`geographic-boat ${active?'is-selected':''}`,html:`<svg width="32" height="42" viewBox="0 0 32 42" aria-hidden="true" style="transform:rotate(${Math.round(p.heading)}deg)"><path d="${shape}" fill="${p.boat.data.colour}" stroke="white" stroke-width="2.5"/></svg>`,iconSize:[32,42],iconAnchor:[16,21]});
+      let item=e.markers.get(p.boat.id);
+      if(!item){
+        const marker=L.marker(p.point,{icon,keyboard:true,title:`Follow ${p.boat.data.name}`,alt:p.boat.data.name,riseOnHover:true}).addTo(e.map);
+        marker.on('click',()=>onSelectRef.current(p.boat.id));
+        const element=marker.getElement();if(element){element.setAttribute('role','button');element.setAttribute('aria-label',`Follow ${p.boat.data.name}`);element.addEventListener('keydown',event=>{if(event.key===' '){event.preventDefault();onSelectRef.current(p.boat.id);}});}
+        item={marker,appearance};e.markers.set(p.boat.id,item);
+      }else {item.marker.setLatLng(p.point);if(item.appearance!==appearance){item.marker.setIcon(icon);item.appearance=appearance;}}
+      item.marker.setZIndexOffset(active?1000:0);
+      const label=document.createElement('span');label.textContent=`${p.boat.data.name}${active?' · '+(p.recorded?'GPS':'demo'):''}`;
+      if(!item.marker.getTooltip())item.marker.bindTooltip(label,{permanent:true,direction:'right',offset:[13,0],className:'boat-map-label'});else item.marker.setTooltipContent(label);
+      if(p.trail.length>1)L.polyline(p.trail,{color:p.boat.data.colour,weight:active?4:2,opacity:active?.9:.35,interactive:false}).addTo(e.trails);
+    }
+  },[ready,positions,selected]);
+
+  useEffect(()=>{
+    const e=engine.current;if(!ready||!e)return;e.weather.clearLayers();if(layer==='course')return;
+    const arrows:Position[]=course.offshore?[[50.48,-1.9],[50.48,-2.35],[50.48,-2.8],[50.48,-3.25]]:[[50.765,-1.47],[50.775,-1.39],[50.798,-1.3],[50.78,-1.21]];
+    for(const point of arrows){const label=layer==='wind'?'↗':'→';e.L.marker(point,{interactive:false,keyboard:false,icon:e.L.divIcon({className:`sample-map-arrow ${layer}`,html:`<span>${label}</span><small>${layer==='wind'?'14 kn · sample':'1.8 kn · sample'}</small>`,iconSize:[94,50],iconAnchor:[47,25]})}).addTo(e.weather);}
+  },[ready,layer,course]);
+
+  function frameIsland(){engine.current?.map.fitBounds([[50.57,-1.62],[50.95,-1.03]],{padding:[24,45],animate:false});}
+  function frameCowes(){engine.current?.map.setView([50.764,-1.297],14,{animate:false});}
+  function locateBoat(){if(spotlight&&engine.current)engine.current.map.setView(spotlight.point,Math.max(engine.current.map.getZoom(),course.offshore?10:13),{animate:false});}
+
+  return <div className="geographic-map-shell">
+    <div ref={host} className="detailed-race-map" role="region" aria-label={`${course.offshore?'South coast':'Solent'} detailed race tracking map`}/>
+    {!ready?<div className="map-loading" role="status">{mapError||'Loading detailed coastal map…'}</div>:null}
+    <div className="chart-options" aria-label="Map detail controls"><label><input type="checkbox" checked={seamarks} onChange={e=>setSeamarks(e.target.checked)}/> Seamarks</label><button onClick={frameIsland}>Island overview</button><button onClick={frameCowes}>Cowes harbour</button></div>
+    <div className="chart-legend"><span className="legend-course"/> Illustrative course <span className="legend-trail"/> Boat trail</div>
+    {spotlight?<button className="map-coordinate" onClick={locateBoat} aria-label={`Locate ${spotlight.boat.data.name} on the map`}><strong>{spotlight.boat.data.name}</strong><span>{coordinate(spotlight.point[0],'N','S')} · {coordinate(spotlight.point[1],'E','W')}</span><small>{spotlight.recorded?'Recorded GPS position':'Simulated position'} · Centre boat ↗</small></button>:null}
+    <div className="chart-disclaimer">{tileError?'Some base map tiles are unavailable. ':seamarks&&seamarkError?'Some seamarks are unavailable. ':''}Sample course · Not for navigation</div>
+  </div>;
 }

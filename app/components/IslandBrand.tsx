@@ -1,13 +1,9 @@
 import Image from 'next/image';
 import { ArrowDown, ArrowUpRight, Compass, MapPin, Waves } from 'lucide-react';
 
-/** An original island-and-wave mark, independent of tourism and event logos. */
-export function IslandMark({ className = '' }: { className?: string }) {
-  return <svg className={className} viewBox="0 0 64 64" fill="none" aria-hidden="true">
-    <path d="M32 5 55 28 32 46 9 28Z" fill="currentColor"/>
-    <path d="m15 28 17-16 17 16-17-5Z" fill="var(--sunshine, #ffdc52)"/>
-    <path d="M6 45c9-9 17 9 26 0s17 9 26 0M6 55c9-9 17 9 26 0s17 9 26 0" stroke="currentColor" strokeWidth="4" strokeLinecap="round"/>
-  </svg>;
+/** Registered 3:5 island flag, reproduced from the public-domain source asset. */
+export function IsleOfWightFlag({ className = '' }: { className?: string }) {
+  return <Image src="/isle-of-wight-flag.svg" width={50} height={30} alt="Official Isle of Wight flag" className={className}/>;
 }
 
 type Props = {
@@ -31,7 +27,7 @@ export function IslandHero({ discipline, onProgramme, onRegister, loaded }: Prop
         <button className="hero-register" disabled={!loaded} onClick={onRegister}>Register your boat <ArrowUpRight size={16}/></button>
       </div>
     </div>
-    <div className="island-stamp"><IslandMark/><span>ISLAND SPIRIT.<br/>OCEAN ADVENTURE.</span></div>
+    <div className="island-stamp"><IsleOfWightFlag/><span>ISLAND SPIRIT.<br/>OCEAN ADVENTURE.</span></div>
     <div className="hero-bottom"><a href="#race-centre"><Compass size={15}/> Your race centre <ArrowDown size={14}/></a><span>Original AI-created illustration</span></div>
   </section>;
 }
