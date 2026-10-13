@@ -41,6 +41,7 @@ export default function FeatureTour({ audience }: { audience: Audience }) {
   const [visited, setVisited] = useState(false);
   const [targetFound, setTargetFound] = useState(true);
   const [autoPlay, setAutoPlay] = useState(true);
+  const [scrollPhase, setScrollPhase] = useState<'opening' | 'down' | 'up' | 'done'>('opening');
   const trigger = useRef<HTMLButtonElement>(null);
   const wasOpen = useRef(false);
   const slides = tours[audience];
@@ -56,6 +57,7 @@ export default function FeatureTour({ audience }: { audience: Audience }) {
     setStep(n => n + 1);
     setVisited(false);
     setTargetFound(true);
+    setScrollPhase('opening');
   };
 
   useEffect(() => {
@@ -101,17 +103,69 @@ export default function FeatureTour({ audience }: { audience: Audience }) {
 
   useEffect(() => {
     if (!open || !autoPlay || !visited) return;
-    const timer = window.setTimeout(() => {
-      if (step === slides.length - 1) {
-        setOpen(false);
-        setAutoPlay(false);
-      } else {
-        setStep(n => n + 1);
-        setVisited(false);
-        setTargetFound(true);
-      }
-    }, 5600);
-    return () => window.clearTimeout(timer);
+    let cancelled = false;
+    let frame = 0;
+    let startTimer = 0;
+    let finishTimer = 0;
+    let resolveStage: (() => void) | null = null;
+    const documentRoot = document.scrollingElement as HTMLElement | null;
+    const nestedScroller = Array.from(document.querySelectorAll<HTMLElement>('main, .main-shell, .viewer-main')).find(element => {
+      const overflow = window.getComputedStyle(element).overflowY;
+      return element.scrollHeight - element.clientHeight > 120 && (overflow === 'auto' || overflow === 'scroll');
+    }) ?? null;
+    const scroller = nestedScroller ?? documentRoot;
+    const isDocument = !nestedScroller;
+
+    const readTop = () => isDocument ? window.scrollY : scroller?.scrollTop ?? 0;
+    const writeTop = (top: number) => {
+      if (isDocument) window.scrollTo(0, top);
+      else if (scroller) scroller.scrollTop = top;
+    };
+    const animateScroll = (from: number, to: number, duration: number) => new Promise<void>(resolve => {
+      const started = performance.now();
+      resolveStage = resolve;
+      const tick = (now: number) => {
+        if (cancelled) { resolve(); return; }
+        const progress = Math.min(1, (now - started) / duration);
+        const eased = progress < .5 ? 2 * progress * progress : 1 - Math.pow(-2 * progress + 2, 2) / 2;
+        writeTop(from + (to - from) * eased);
+        if (progress < 1) frame = window.requestAnimationFrame(tick);
+        else { resolveStage = null; resolve(); }
+      };
+      frame = window.requestAnimationFrame(tick);
+    });
+
+    startTimer = window.setTimeout(async () => {
+      if (cancelled) return;
+      const maxTop = Math.max(0, (scroller?.scrollHeight ?? document.documentElement.scrollHeight) - (scroller?.clientHeight ?? window.innerHeight));
+      setScrollPhase('down');
+      const top = readTop();
+      await animateScroll(top, maxTop, maxTop > 80 ? 4200 : 1100);
+      if (cancelled) return;
+      setScrollPhase('up');
+      await animateScroll(readTop(), 0, maxTop > 80 ? 4200 : 1100);
+      if (cancelled) return;
+      setScrollPhase('done');
+      finishTimer = window.setTimeout(() => {
+        if (step === slides.length - 1) {
+          setOpen(false);
+          setAutoPlay(false);
+        } else {
+          setStep(n => n + 1);
+          setVisited(false);
+          setTargetFound(true);
+          setScrollPhase('opening');
+        }
+      }, 600);
+    }, 350);
+
+    return () => {
+      cancelled = true;
+      window.clearTimeout(startTimer);
+      window.clearTimeout(finishTimer);
+      if (frame) window.cancelAnimationFrame(frame);
+      resolveStage?.();
+    };
   }, [open, autoPlay, visited, step, slides.length]);
 
   useEffect(() => {
@@ -122,7 +176,7 @@ export default function FeatureTour({ audience }: { audience: Audience }) {
   const closeTour = () => { setOpen(false); setAutoPlay(false); };
 
   return <>
-    <button ref={trigger} className="feature-tour-trigger" type="button" onClick={() => { setStep(0); setVisited(false); setTargetFound(true); setAutoPlay(true); setOpen(true); }} aria-haspopup="dialog">
+    <button ref={trigger} className="feature-tour-trigger" type="button" onClick={() => { setStep(0); setVisited(false); setTargetFound(true); setScrollPhase('opening'); setAutoPlay(true); setOpen(true); }} aria-haspopup="dialog">
       <Sparkles size={14} aria-hidden="true"/><span>Take a quick tour</span>
     </button>
     {open && <section className="feature-tour-guided" role="dialog" aria-label={audience === 'spectator' ? 'Spectator storyboard demo' : 'Organiser storyboard demo'} aria-live="polite">
@@ -142,7 +196,7 @@ export default function FeatureTour({ audience }: { audience: Audience }) {
       {!visited
         ? <p className="feature-tour-guided-prompt">{targetFound ? autoPlay ? <>Opening the highlighted <strong>{current.menuName}</strong> menu automatically…</> : <>Click the highlighted <strong>{current.menuName}</strong> menu item to open it.</> : <>The <strong>{current.menuName}</strong> menu item is not available on this screen. You can continue to the next scene.</>}</p>
         : <p className="feature-tour-guided-demo">{current.demo}</p>}
-      <p className="feature-tour-guided-status">{autoPlay ? 'Playing automatically · pauses briefly on each scene' : 'Paused · use Play or Next scene to continue'}</p>
+      <p className="feature-tour-guided-status">{!autoPlay ? 'Paused · use Play or Next scene to continue' : !visited ? 'Opening the selected screen…' : scrollPhase === 'down' ? 'Slowly scrolling down this screen…' : scrollPhase === 'up' ? 'Returning slowly to the top…' : scrollPhase === 'done' ? 'Scene complete · moving on…' : 'Preparing this screen…'}</p>
       <div className="feature-tour-guided-footer">
         <button type="button" className="feature-tour-guided-close-text" onClick={closeTour}>End demo</button>
         <div className="feature-tour-guided-progress" aria-label={'Frame ' + (step + 1) + ' of ' + slides.length}>{String(step + 1).padStart(2, '0')} <span>/</span> {String(slides.length).padStart(2, '0')}</div>
