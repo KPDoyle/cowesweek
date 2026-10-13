@@ -21,5 +21,13 @@ export function withDemoExtras(records:Entry[]){
  if(!next.some(r=>r.kind==='series'))add('series','demo-series',{name:'Solent Series · demonstration',discipline:'sailing',className:'IRC 1',raceIds:'race-irc,race-irc2',discards:0,minimumRaces:1,published:true});
  if(!next.some(r=>r.kind==='conditions'))for(const discipline of ['sailing','powerboat'])add('conditions',`demo-conditions-${discipline}`,{discipline,windSpeed:14,windFrom:225,tideSpeed:1.8,tideDirection:90,tackAngle:45,source:'sample',sourceUrl:'',time:'2026-08-01T09:00:00Z'});
  if(!next.some(r=>r.kind==='venue'))for(const [i,name,lat,lon,description] of [[1,'The Parade',50.7675,-1.298,'Cowes waterfront viewpoint'],[2,'Egypt Point',50.7708,-1.324,'West Solent shoreline viewpoint'],[3,'Cowes Yacht Haven',50.7612,-1.299,'Marina and event hub']] as const)add('venue',`demo-venue-${i}`,{name,lat,lon,description,url:`https://www.google.com/maps/search/?api=1&query=${lat},${lon}`,published:true});
+ // Client-only sample finishes let the public leaderboard and results screens be explored
+ // before official results are published. They never enter the organiser store.
+ const demoRaces=next.filter((r):r is Entry<'race'>=>r.kind==='race'&&!r.data.published&&(r.data.status==='racing'||r.data.status==='finished'));
+ for(const race of demoRaces){
+  if(next.some(r=>r.kind==='result'&&r.data.raceId===race.id))continue;
+  const fleet=next.filter((r):r is Entry<'boat'>=>r.kind==='boat'&&r.data.discipline===race.data.discipline&&r.data.className===race.data.className).slice(0,5);
+  fleet.forEach((boat,index)=>add('result',`demo-result-${race.id}-${boat.id}`,{raceId:race.id,boatId:boat.id,elapsed:(race.data.discipline==='sailing'?6900:8700)+index*48,penalty:index===2?20:0,laps:race.data.laps,status:'finished',note:'Simulated demonstration result · not official'}));
+ }
  return next;
 }
