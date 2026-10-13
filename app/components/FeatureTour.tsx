@@ -1,7 +1,7 @@
 'use client';
 
 import { useEffect, useRef, useState } from 'react';
-import { Anchor, ArrowLeft, ArrowRight, CalendarDays, Compass, Flag, Layers3, Play, ShieldCheck, Ship, Sparkles, Trophy, Users, X } from 'lucide-react';
+import { Anchor, ArrowLeft, ArrowRight, Bell, CalendarDays, Compass, Download, Flag, Layers3, MapPin, Play, Radio, ShieldCheck, Ship, Sparkles, Trophy, Users, Video, X } from 'lucide-react';
 
 type Audience = 'spectator' | 'organiser';
 const tours = {
