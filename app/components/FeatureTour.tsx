@@ -80,22 +80,34 @@ export default function FeatureTour({ audience }: { audience: Audience }) {
     setTargetFound(true);
   };
 
+  const Icon = current.icon;
   return <>
     <button ref={trigger} className="feature-tour-trigger" type="button" onClick={() => { setStep(0); setVisited(false); setTargetFound(true); setOpen(true); }} aria-haspopup="dialog">
       <Sparkles size={14} aria-hidden="true"/><span>Take a quick tour</span>
     </button>
-    {open && <section className="feature-tour-guided" role="dialog" aria-label={audience === 'spectator' ? 'Spectator guided tour' : 'Organiser guided tour'} aria-live="polite">
-      <button className="feature-tour-guided-close" type="button" onClick={() => setOpen(false)} aria-label="Close tour"><X size={17}/></button>
-      <p className="feature-tour-guided-eyebrow"><span/> {audience === 'spectator' ? 'SPECTATOR TOUR' : 'ORGANISER TOUR'} <i>•</i> STEP {String(step + 1).padStart(2, '0')} OF {String(slides.length).padStart(2, '0')}</p>
+    {open && <section className="feature-tour-guided" role="dialog" aria-label={audience === 'spectator' ? 'Spectator storyboard demo' : 'Organiser storyboard demo'} aria-live="polite">
+      <button className="feature-tour-guided-close" type="button" onClick={() => setOpen(false)} aria-label="Close demo"><X size={17}/></button>
+      <p className="feature-tour-guided-eyebrow"><span/> STORYBOARD DEMO <i>•</i> {audience === 'spectator' ? 'SPECTATOR' : 'RACE OFFICE'} <i>•</i> FRAME {String(step + 1).padStart(2, '0')} OF {String(slides.length).padStart(2, '0')}</p>
+      <div className="feature-tour-storyboard" data-audience={audience} data-scene={current.scene} aria-hidden="true">
+        <div className="feature-tour-storyboard-frame"><span>FRAME {String(step + 1).padStart(2, '0')}</span><span>{audience === 'spectator' ? 'COWES WEEK LIVE' : 'RACE DAY WORKSPACE'}</span></div>
+        <svg className="feature-tour-storyboard-route" viewBox="0 0 420 100" preserveAspectRatio="none">
+          <path d="M12 78 C78 70 83 28 150 42 S230 84 277 42 S352 26 408 12"/>
+          <circle cx="12" cy="78" r="4"/><circle cx="150" cy="42" r="4"/><circle cx="277" cy="42" r="4"/><circle cx="408" cy="12" r="4"/>
+        </svg>
+        <div className="feature-tour-storyboard-caption"><span><Icon size={16}/></span><div><small>STORY BEAT {String(step + 1).padStart(2, '0')}</small><strong>{current.label}</strong></div></div>
+        <div className="feature-tour-storyboard-counter">{String(step + 1).padStart(2, '0')}<i>/</i>{String(slides.length).padStart(2, '0')}</div>
+      </div>
       <div className="feature-tour-guided-title">{current.title}</div>
+      <p className="feature-tour-guided-summary">{current.summary}</p>
       {!visited
-        ? <p className="feature-tour-guided-prompt">{targetFound ? <>Click the highlighted <strong>{current.menuName}</strong> menu item to open it.</> : <>The <strong>{current.menuName}</strong> menu item is not available on this screen. You can continue to the next step.</>}</p>
-        : <><p className="feature-tour-guided-summary">{current.summary}</p><p className="feature-tour-guided-demo">{current.demo}</p></>}
+        ? <p className="feature-tour-guided-prompt">{targetFound ? <>Click the highlighted <strong>{current.menuName}</strong> menu item to bring this scene to life.</> : <>The <strong>{current.menuName}</strong> menu item is not available on this screen. You can continue to the next scene.</>}</p>
+        : <p className="feature-tour-guided-demo">{current.demo}</p>}
       <div className="feature-tour-guided-footer">
-        <button type="button" className="feature-tour-guided-close-text" onClick={() => setOpen(false)}>End tour</button>
-        <div className="feature-tour-guided-progress" aria-label={'Step ' + (step + 1) + ' of ' + slides.length}>{String(step + 1).padStart(2, '0')} <span>/</span> {String(slides.length).padStart(2, '0')}</div>
-        <button type="button" className="feature-tour-guided-next" onClick={advance} disabled={!visited && targetFound}>{step === slides.length - 1 ? 'Finish tour' : visited ? 'Next menu' : 'Continue'} <ArrowRight size={15}/></button>
+        <button type="button" className="feature-tour-guided-close-text" onClick={() => setOpen(false)}>End demo</button>
+        <div className="feature-tour-guided-progress" aria-label={'Frame ' + (step + 1) + ' of ' + slides.length}>{String(step + 1).padStart(2, '0')} <span>/</span> {String(slides.length).padStart(2, '0')}</div>
+        <button type="button" className="feature-tour-guided-next" onClick={advance} disabled={!visited && targetFound}>{step === slides.length - 1 ? 'Finish demo' : visited ? 'Next scene' : 'Continue'} <ArrowRight size={15}/></button>
       </div>
     </section>}
   </>;
+
 }
