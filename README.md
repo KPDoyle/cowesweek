@@ -24,6 +24,14 @@ Both projects use the private Vercel Blob store via `BLOB_STORE_ID` and project 
 
 Organiser-only `/api/ingest` supports manual synchronisation of normalised HTTPS tracking and weather JSON. Configure `TRACKING_FEED_URL`, `TRACKING_FEED_ALLOWED_HOSTS` and optional `TRACKING_FEED_TOKEN`; equivalent `WEATHER_` settings apply. Tokens stay server-side. Tracking JSON: `{ "reports": [{ "boatId": "existing-id", "raceId": "existing-race", "time": "ISO UTC", "lat": 50.779, "lon": -1.302, "speed": 8, "heading": 225 }] }`. Weather JSON: `{ "observations": [{ "discipline": "sailing", "windSpeed": 14, "windFrom": 225, "tideSpeed": 1.8, "tideDirection": 90, "tackAngle": 45, "time": "ISO UTC" }] }`. Tracking upserts duplicate boat/race/timestamp reports. Provider-specific endpoints, licences and approved broadcast sources must be supplied by the organiser.
 
+## Cowes Week and Nautical Cloud integration
+
+The spectator footer links to the official Cowes Week site. The organiser's GPS & feeds panel links to Cowes Week and Nautical Cloud and reports whether approved tracking and weather endpoints are configured. Official Cowes Week pages are linked as the authority; this app does not scrape them or imply an official partnership.
+
+Nautical Cloud documents YB Tracker integration, but its public documentation does not provide API endpoint or credential instructions. When the event organiser and provider supply an approved endpoint, the existing server-side tracking adapter can consume normalised HTTPS position data; the weather adapter accepts normalised observations. Set TRACKING_FEED_URL, TRACKING_FEED_ALLOWED_HOSTS, and optional TRACKING_FEED_TOKEN, plus the equivalent WEATHER_ settings, in the protected organiser Vercel project only. Then use Check feed configuration and Synchronise in Race Studio. Do not expose tokens to the public project.
+
+Nautical Cloud entries, official results, notices, payments, protests, and powerboat timing are not connected by this adapter. Connect them only against an authorised vendor API/export specification and agreed field mapping. Until then, the organiser workspace remains the place to review and publish those records.
+
 ## Demonstration and limits
 
 Seeded boats, crews, races, results and conditions are fictional. Official tracking, weather and video are disconnected until configured. Imported reports show last-known recorded positions at the shared clock, with stale-data flags; simulated positions are clearly labelled. Course proximity and projected finishes are estimates. Published finish records remain authoritative. The series engine supports the listed low-point rules and organiser points overrides, rather than every possible sailing instruction. Satellite imagery is a coarse NASA global overview; 3D is a pitched map, without terrain or modelled boat hulls.
