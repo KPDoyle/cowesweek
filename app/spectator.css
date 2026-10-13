@@ -246,3 +246,33 @@ main{padding-top:26px}
 .feature-tour-guided-next:disabled{background:#b6c3cf;color:#fff;cursor:not-allowed}
 @media(max-width:700px){.feature-tour-guided{right:12px;bottom:12px;width:calc(100vw - 24px);padding:16px 16px 13px}.feature-tour-guided-title{font-size:17px}.feature-tour-highlight{outline-width:2px!important;outline-offset:2px!important;box-shadow:0 0 0 5px #ffdc5250!important}}
 @media(prefers-reduced-motion:reduce){.feature-tour-guided{animation:none}}
+
+/* Storyboard frames shown by the quick-tour trigger */
+.feature-tour-guided{max-height:calc(100dvh - 32px);overflow-y:auto}
+.feature-tour-storyboard{position:relative;isolation:isolate;height:146px;margin:13px 0 12px;overflow:hidden;border:1px solid #ffffff52;border-radius:12px;background-image:linear-gradient(180deg,#06233d5c 0%,#06233d10 41%,#061c33d9 100%),url('/tour-solent.webp');background-size:cover;background-position:62% 48%;box-shadow:inset 0 0 35px #041a2f25}
+.feature-tour-storyboard[data-audience="organiser"]{background-image:linear-gradient(180deg,#06233d65 0%,#06233d10 41%,#061c33e6 100%),url('/tour-race-office.webp');background-position:56% 50%}
+.feature-tour-storyboard[data-scene="layers"]{background-position:80% 42%}
+.feature-tour-storyboard[data-scene="replay"]{background-position:37% 57%}
+.feature-tour-storyboard[data-scene="results"]{background-position:69% 62%}
+.feature-tour-storyboard[data-scene="shore"]{background-position:20% 45%}
+.feature-tour-storyboard[data-audience="organiser"][data-scene="schedule"]{background-position:18% 53%}
+.feature-tour-storyboard[data-audience="organiser"][data-scene="fleet"]{background-position:73% 54%}
+.feature-tour-storyboard[data-audience="organiser"][data-scene="office"]{background-position:66% 50%}
+.feature-tour-storyboard[data-audience="organiser"][data-scene="course"]{background-position:38% 68%}
+.feature-tour-storyboard[data-audience="organiser"][data-scene="publish"]{background-position:8% 42%}
+.feature-tour-storyboard-frame{position:absolute;top:11px;left:12px;right:12px;display:flex;justify-content:space-between;gap:10px;color:white;font-size:7px;font-weight:800;letter-spacing:1.1px;text-shadow:0 2px 7px #031629}
+.feature-tour-storyboard-frame span:first-child{padding:5px 7px;border:1px solid #ffffff54;border-radius:5px;background:#071e3cc7;color:#ffe08a}
+.feature-tour-storyboard-route{position:absolute;inset:20px 0 0;width:100%;height:88%;opacity:.8;filter:drop-shadow(0 2px 4px #052039)}
+.feature-tour-storyboard-route path{fill:none;stroke:#fff0bb;stroke-width:2;stroke-dasharray:6 7;stroke-linecap:round}
+.feature-tour-storyboard-route circle{fill:#163d51;stroke:#fff1bc;stroke-width:2}
+.feature-tour-storyboard[data-audience="organiser"] .feature-tour-storyboard-route path{stroke:#b8f1dc}
+.feature-tour-storyboard[data-audience="organiser"] .feature-tour-storyboard-route circle{stroke:#c7f1df}
+.feature-tour-storyboard-caption{position:absolute;left:12px;bottom:11px;display:flex;align-items:center;gap:8px;padding:8px 10px;border:1px solid #ffffff50;border-radius:9px;background:#061f33db;color:#fff;backdrop-filter:blur(8px)}
+.feature-tour-storyboard-caption>span{display:grid;place-items:center;width:27px;height:27px;border:1px solid #f4d48850;border-radius:7px;background:#e0b75b25;color:#ffdc87}
+.feature-tour-storyboard[data-audience="organiser"] .feature-tour-storyboard-caption>span{border-color:#8ddcbd50;background:#8ddcbd22;color:#b9f1d8}
+.feature-tour-storyboard-caption>div{display:flex;flex-direction:column;gap:3px}
+.feature-tour-storyboard-caption small{color:#d5e2e5;font-size:6px;font-weight:800;letter-spacing:1px}
+.feature-tour-storyboard-caption strong{font-size:10px;line-height:1.1}
+.feature-tour-storyboard-counter{position:absolute;right:12px;bottom:13px;color:#ffdc87;font-size:10px;font-weight:800;letter-spacing:.6px;text-shadow:0 2px 5px #061c33}
+.feature-tour-storyboard-counter i{margin:0 3px;color:#ffffffaa;font-size:8px;font-style:normal}
+@media(max-width:700px){.feature-tour-guided{max-height:calc(100dvh - 24px)}.feature-tour-storyboard{height:112px;margin:10px 0}.feature-tour-storyboard-frame{top:8px;left:9px;right:9px;font-size:6px}.feature-tour-storyboard-caption{left:9px;bottom:8px;padding:6px 8px}.feature-tour-storyboard-counter{right:9px;bottom:11px}}
