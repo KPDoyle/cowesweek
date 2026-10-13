@@ -40,53 +40,93 @@ export default function FeatureTour({ audience }: { audience: Audience }) {
   const [step, setStep] = useState(0);
   const [visited, setVisited] = useState(false);
   const [targetFound, setTargetFound] = useState(true);
+  const [autoPlay, setAutoPlay] = useState(true);
   const trigger = useRef<HTMLButtonElement>(null);
   const wasOpen = useRef(false);
   const slides = tours[audience];
   const current = slides[step];
+  const Icon = current.icon;
+
+  const advance = () => {
+    if (step === slides.length - 1) {
+      setOpen(false);
+      setAutoPlay(false);
+      return;
+    }
+    setStep(n => n + 1);
+    setVisited(false);
+    setTargetFound(true);
+  };
 
   useEffect(() => {
     if (!open) return;
     const candidates = Array.from(document.querySelectorAll<HTMLElement>('[data-tour-menu="' + current.menu + '"]'));
     const target = candidates.find(item => item.getClientRects().length > 0) ?? candidates[0];
     setTargetFound(Boolean(target));
-    if (!target || visited) return;
-    target.classList.add('feature-tour-highlight');
-    target.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
-    const onMenuClick = () => setVisited(true);
-    target.addEventListener('click', onMenuClick, true);
+    if (target && !visited) {
+      target.classList.add('feature-tour-highlight');
+      target.scrollIntoView({ block: 'nearest', inline: 'nearest', behavior: 'smooth' });
+    }
+    const onMenuClick = (event: MouseEvent) => {
+      if (target && event.target instanceof Node && target.contains(event.target)) setVisited(true);
+    };
+    if (target) target.addEventListener('click', onMenuClick, true);
     const onKey = (event: KeyboardEvent) => {
-      if (event.key === 'Escape') setOpen(false);
-      if (event.key === 'ArrowRight') { setStep(n => Math.min(n + 1, slides.length - 1)); setVisited(false); setTargetFound(true); }
-      if (event.key === 'ArrowLeft') { setStep(n => Math.max(n - 1, 0)); setVisited(false); setTargetFound(true); }
+      if (event.key === 'Escape') { setOpen(false); setAutoPlay(false); }
+      if (event.key === 'ArrowRight') advance();
+      if (event.key === 'ArrowLeft') {
+        setStep(n => Math.max(n - 1, 0));
+        setVisited(false);
+        setTargetFound(true);
+      }
     };
     window.addEventListener('keydown', onKey);
     return () => {
-      target.classList.remove('feature-tour-highlight');
-      target.removeEventListener('click', onMenuClick, true);
+      target?.classList.remove('feature-tour-highlight');
+      if (target) target.removeEventListener('click', onMenuClick, true);
       window.removeEventListener('keydown', onKey);
     };
-  }, [open, step, visited, current.menu, slides.length]);
+  }, [open, step, visited, current.menu]);
+
+  useEffect(() => {
+    if (!open || !autoPlay || visited) return;
+    const timer = window.setTimeout(() => {
+      const candidates = Array.from(document.querySelectorAll<HTMLElement>('[data-tour-menu="' + current.menu + '"]'));
+      const target = candidates.find(item => item.getClientRects().length > 0) ?? candidates[0];
+      if (target) target.click();
+      else setVisited(true);
+    }, 900);
+    return () => window.clearTimeout(timer);
+  }, [open, autoPlay, visited, step, current.menu]);
+
+  useEffect(() => {
+    if (!open || !autoPlay || !visited) return;
+    const timer = window.setTimeout(() => {
+      if (step === slides.length - 1) {
+        setOpen(false);
+        setAutoPlay(false);
+      } else {
+        setStep(n => n + 1);
+        setVisited(false);
+        setTargetFound(true);
+      }
+    }, 5600);
+    return () => window.clearTimeout(timer);
+  }, [open, autoPlay, visited, step, slides.length]);
 
   useEffect(() => {
     if (open) wasOpen.current = true;
     else if (wasOpen.current) { trigger.current?.focus(); wasOpen.current = false; }
   }, [open]);
 
-  const advance = () => {
-    if (step === slides.length - 1) { setOpen(false); return; }
-    setStep(n => n + 1);
-    setVisited(false);
-    setTargetFound(true);
-  };
+  const closeTour = () => { setOpen(false); setAutoPlay(false); };
 
-  const Icon = current.icon;
   return <>
-    <button ref={trigger} className="feature-tour-trigger" type="button" onClick={() => { setStep(0); setVisited(false); setTargetFound(true); setOpen(true); }} aria-haspopup="dialog">
+    <button ref={trigger} className="feature-tour-trigger" type="button" onClick={() => { setStep(0); setVisited(false); setTargetFound(true); setAutoPlay(true); setOpen(true); }} aria-haspopup="dialog">
       <Sparkles size={14} aria-hidden="true"/><span>Take a quick tour</span>
     </button>
     {open && <section className="feature-tour-guided" role="dialog" aria-label={audience === 'spectator' ? 'Spectator storyboard demo' : 'Organiser storyboard demo'} aria-live="polite">
-      <button className="feature-tour-guided-close" type="button" onClick={() => setOpen(false)} aria-label="Close demo"><X size={17}/></button>
+      <button className="feature-tour-guided-close" type="button" onClick={closeTour} aria-label="Close demo"><X size={17}/></button>
       <p className="feature-tour-guided-eyebrow"><span/> STORYBOARD DEMO <i>•</i> {audience === 'spectator' ? 'SPECTATOR' : 'RACE OFFICE'} <i>•</i> FRAME {String(step + 1).padStart(2, '0')} OF {String(slides.length).padStart(2, '0')}</p>
       <div className="feature-tour-storyboard" data-audience={audience} data-scene={current.scene} aria-hidden="true">
         <div className="feature-tour-storyboard-frame"><span>FRAME {String(step + 1).padStart(2, '0')}</span><span>{audience === 'spectator' ? 'COWES WEEK LIVE' : 'RACE DAY WORKSPACE'}</span></div>
@@ -100,14 +140,17 @@ export default function FeatureTour({ audience }: { audience: Audience }) {
       <div className="feature-tour-guided-title">{current.title}</div>
       <p className="feature-tour-guided-summary">{current.summary}</p>
       {!visited
-        ? <p className="feature-tour-guided-prompt">{targetFound ? <>Click the highlighted <strong>{current.menuName}</strong> menu item to bring this scene to life.</> : <>The <strong>{current.menuName}</strong> menu item is not available on this screen. You can continue to the next scene.</>}</p>
+        ? <p className="feature-tour-guided-prompt">{targetFound ? autoPlay ? <>Opening the highlighted <strong>{current.menuName}</strong> menu automatically…</> : <>Click the highlighted <strong>{current.menuName}</strong> menu item to open it.</> : <>The <strong>{current.menuName}</strong> menu item is not available on this screen. You can continue to the next scene.</>}</p>
         : <p className="feature-tour-guided-demo">{current.demo}</p>}
+      <p className="feature-tour-guided-status">{autoPlay ? 'Playing automatically · pauses briefly on each scene' : 'Paused · use Play or Next scene to continue'}</p>
       <div className="feature-tour-guided-footer">
-        <button type="button" className="feature-tour-guided-close-text" onClick={() => setOpen(false)}>End demo</button>
+        <button type="button" className="feature-tour-guided-close-text" onClick={closeTour}>End demo</button>
         <div className="feature-tour-guided-progress" aria-label={'Frame ' + (step + 1) + ' of ' + slides.length}>{String(step + 1).padStart(2, '0')} <span>/</span> {String(slides.length).padStart(2, '0')}</div>
-        <button type="button" className="feature-tour-guided-next" onClick={advance} disabled={!visited && targetFound}>{step === slides.length - 1 ? 'Finish demo' : visited ? 'Next scene' : 'Continue'} <ArrowRight size={15}/></button>
+        <div className="feature-tour-guided-controls">
+          <button type="button" className="feature-tour-guided-toggle" onClick={() => setAutoPlay(value => !value)} aria-label={autoPlay ? 'Pause storyboard' : 'Resume storyboard'}>{autoPlay ? <Pause size={14}/> : <Play size={14}/>}</button>
+          <button type="button" className="feature-tour-guided-next" onClick={advance} disabled={!visited && targetFound}>{step === slides.length - 1 ? 'Finish demo' : 'Next scene'} <ArrowRight size={15}/></button>
+        </div>
       </div>
     </section>}
   </>;
-
 }
