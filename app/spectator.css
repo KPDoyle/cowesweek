@@ -276,3 +276,11 @@ main{padding-top:26px}
 .feature-tour-storyboard-counter{position:absolute;right:12px;bottom:13px;color:#ffdc87;font-size:10px;font-weight:800;letter-spacing:.6px;text-shadow:0 2px 5px #061c33}
 .feature-tour-storyboard-counter i{margin:0 3px;color:#ffffffaa;font-size:8px;font-style:normal}
 @media(max-width:700px){.feature-tour-guided{max-height:calc(100dvh - 24px)}.feature-tour-storyboard{height:112px;margin:10px 0}.feature-tour-storyboard-frame{top:8px;left:9px;right:9px;font-size:6px}.feature-tour-storyboard-caption{left:9px;bottom:8px;padding:6px 8px}.feature-tour-storyboard-counter{right:9px;bottom:11px}}
+
+/* Controls for automatic storyboard playback */
+.feature-tour-guided-status{margin-top:8px;color:#7b8996;font-size:9px;line-height:1.4}
+.feature-tour-guided-controls{display:flex;align-items:center;gap:7px}
+.feature-tour-guided-toggle{display:grid;place-items:center;width:34px;height:34px;border:1px solid #d3dee8;border-radius:9px;background:#fff;color:#155e8c}
+.feature-tour-guided-toggle:hover{background:#edf4fa;border-color:#a9bfd1}
+.feature-tour-guided-next{min-height:34px}
+@media(max-width:700px){.feature-tour-guided-footer{gap:7px}.feature-tour-guided-controls{gap:5px}.feature-tour-guided-next{padding:8px 9px;font-size:9px}}
