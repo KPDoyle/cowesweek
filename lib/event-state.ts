@@ -36,6 +36,8 @@ export function applyOperations(state:EventState,raw:unknown,actor='Race office'
    if(d.clubId&&!records.some(r=>r.kind==='club'&&r.id===d.clubId))throw new EventError('Choose an existing yacht club');
    if(d.venueId&&!records.some(r=>r.kind==='venue'&&r.id===d.venueId))throw new EventError('Choose an existing venue');
    if(['declaration','crewaccess'].includes(op.kind)&&records.some(r=>r.kind===op.kind&&r.id!==id&&(r.data as Record<string,unknown>).boatId===d.boatId&&(op.kind!=='declaration'||(r.data as Record<string,unknown>).raceId===d.raceId)))throw new EventError('A record already exists. Edit the existing record.',409);
+   if(op.kind==='platformplan'&&records.some(r=>r.kind==='platformplan'&&r.id!==id))throw new EventError('Edit the existing platform plan.',409);
+   if(op.kind==='integrationplan'&&records.some(r=>r.kind==='integrationplan'&&r.id!==id&&r.data.area===d.area))throw new EventError('Edit the existing interface plan for this area.',409);
    if(op.kind==='series'){const ids=String(d.raceIds).split(',').map(v=>v.trim());if(!ids.length||new Set(ids).size!==ids.length||ids.some(id=>!records.some(r=>r.kind==='race'&&r.id===id&&r.data.discipline===d.discipline&&r.data.className===d.className)))throw new EventError('Choose unique existing races from the selected class.');}
    if(op.kind==='boat'&&d.status==='checked-in'&&!requiredChecks(String(d.discipline)).every(c=>(d.checks as string[]).includes(c)))throw new EventError('Complete the readiness checklist before check-in.');
    if(op.kind==='berth'&&((d.status==='available'&&d.boatId)||(d.status==='occupied'&&!d.boatId)))throw new EventError('Available berths must be unallocated; occupied berths need a boat.');
