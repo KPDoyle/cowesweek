@@ -47,3 +47,7 @@ Tests cover private persistence, validation, atomic edits, concurrency, preview 
 Open **Regatta operations** in the office rail, or `/office?view=operations`, for entries import, payment ledger, declarations, automated club results/prize packs, shoreside schedules, targeted communications, official forecasts, benefits, registration codes and all-fleet tracking coverage. `/hub` offers role selection; `/crew` is the boat-code protected competitor portal. GPS locations are private unless the office explicitly approves public tracking separately from the boat profile.
 
 See [the operational review and connection guide](docs/OPERATIONS.md) for coverage, scheduled email gateway configuration and verification limits. New workflows require no production data migration.
+
+## Organiser platform template
+
+The office now opens with **Platform blueprint**: a reusable event vision, links to working modules, nine editable existing-system connection plans, a four-stage race-day walkthrough, pilot acceptance checklist and a downloadable platform brief. Plans are saved as organiser records and excluded from public feeds. Planning stages do not activate supplier connections. The current mobile app, official scoring, course setting, payment provider and tracking / weather systems remain part of the proposed operating model.

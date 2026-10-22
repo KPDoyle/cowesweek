@@ -1,10 +1,16 @@
 # Cowes Week operational review — 22 October 2026
 
-Scope: Kerriann Murray's “Info requested” email, including the highlighted dashboard additions and managed data streams. The existing fleet editor, readiness/check-in, course geometry/GeoJSON, maps, results, notices, incidents and protests remain in place.
+Scope: the organising team’s existing mobile experience, dashboard workflows and managed data streams. The existing fleet editor, readiness/check-in, course geometry/GeoJSON, maps, results, notices, incidents and protests remain in place.
+
+## Organiser platform template
+
+`/office` opens the platform blueprint. Organisers can tailor the event name, organising team, scope, priorities and lead; define the nine existing-system connection plans; walk through before-event, race-morning, on-water and after-racing workflows; mark pilot acceptance gates; and export a reusable Markdown brief. Plans are stored with audit/concurrency controls and excluded from the public feed. Suggested supplier names remain unconfirmed until edited. Planning approval is not a live connection status.
+
+The open demonstration uses fictional event data. Staff authentication and data permissions are an explicit live-release acceptance item. No real integrations, credentials or supplier messages are created by saving the template.
 
 ## Added workflows
 
-Open `/office?view=operations` or **Regatta operations** in the left rail. Coverage links every requirement to its workflow and states external dependencies.
+Open `/office?view=operations` or **Regatta operations** in the left rail. Overview links every capability to its workflow and states external dependencies.
 
 | Area | Implementation |
 | --- | --- |
@@ -36,7 +42,7 @@ Packs contain published results and manually confirmed prize assignments. Draft 
 
 ## Deployment and operational limits
 
-Both existing Vercel projects build this repository. Preserve **all deployment URL** Vercel Authentication on `cowesweek`. `cowesweek-live` retains `COWES_PUBLIC_ONLY=1`: organiser APIs deny access there, while `/api/competitor` allows only authenticated, boat-scoped operations. Both use the existing private Blob store. No production records are migrated or replaced by this update.
+Both existing Vercel projects build this repository. The organiser demonstration is open for review at the user’s request. Before real personal, payment or safety records are introduced, the event release plan must define authenticated staff access. `cowesweek-live` retains `COWES_PUBLIC_ONLY=1`: organiser APIs deny access there, while `/api/competitor` allows only authenticated, boat-scoped operations. Both use the existing private Blob store. No production records are migrated or replaced by this update.
 
 Official tracking/weather, payment processing, native push, app-store binaries and background phone GPS require the respective providers/access; this update does not represent those as connected. The responsive website works on iPhone/Android, but it is not a native tracking app. Media sees public information; restricted media/staff records remain within the protected office until a dedicated staff identity system is connected.
 

@@ -12,7 +12,7 @@
     "start": "next start",
     "lint": "eslint . --ignore-pattern dist --ignore-pattern .next",
     "db:generate": "drizzle-kit generate",
-    "test": "node tests/verify-vercel.mjs && node tests/verify-spectator.mjs && node tests/verify-operations.mjs && node tests/verify-crew-api.mjs && node tests/verify-club-delivery.mjs",
+    "test": "node tests/verify-vercel.mjs && node tests/verify-spectator.mjs && node tests/verify-operations.mjs && node tests/verify-crew-api.mjs && node tests/verify-club-delivery.mjs && node tests/verify-platform.mjs",
     "build:vercel": "next build --webpack",
     "dev:vercel": "next dev"
   },
