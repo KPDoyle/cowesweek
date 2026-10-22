@@ -1,0 +1,22 @@
+import assert from 'node:assert/strict';
+import { build } from 'esbuild';
+async function module(file,mock=false){const r=await build({entryPoints:[file],bundle:true,write:false,format:'esm',platform:'node',plugins:mock?[{name:'event-test',setup(b){b.onResolve({filter:/(?:@\/lib\/|\.\/)event-service$/},()=>({path:'store',namespace:'test'}));b.onLoad({filter:/.*/,namespace:'test'},()=>({resolveDir:process.cwd(),contents:'import {EventError} from "./lib/event-state.ts";export const readStore=async()=>({state:globalThis.__eventTest.state});export const commitOperations=async(body,actor)=>{try{return globalThis.__eventTest.commit(body,actor);}catch(e){throw new EventError(e.message,e.status);}};'}));}}]:[]});return import('data:text/javascript;base64,'+Buffer.from(r.outputFiles[0].text).toString('base64'));}
+const {seed}=await module('lib/seed.ts'),{applyOperations}=await module('lib/event-state.ts'),{newCode,hashCode}=await module('lib/crew-access.ts');
+const code=newCode();let state={records:structuredClone(seed),audit:[],revision:1};state=applyOperations(state,{kind:'crewaccess',id:'test-access',data:{boatId:'sail-0',codeHash:hashCode(code),active:true,expiresAt:new Date(Date.now()+86400000).toISOString()}});
+globalThis.__eventTest={state,commit(body,actor){this.state=applyOperations(this.state,body,actor);return this.state;}};
+const api=await module('app/api/competitor/route.ts',true);
+const request=(body,cookie='',origin='https://race.example.test')=>new Request('https://race.example.test/api/competitor',{method:'POST',headers:{origin,cookie,'Content-Type':'application/json'},body:JSON.stringify(body)});
+assert.equal((await api.GET(new Request('https://race.example.test/api/competitor'))).status,401);
+assert.equal((await api.POST(request({action:'login',code:'wrong'}))).status,401);
+assert.equal((await api.POST(request({action:'login',code},'','https://attacker.example.test'))).status,403);
+let response=await api.POST(request({action:'login',code}));assert.equal(response.status,200);assert.match(response.headers.get('set-cookie'),/HttpOnly; SameSite=Strict.*Secure/);const cookie=response.headers.get('set-cookie').split(';')[0];let data=await response.json();assert.equal(data.records.filter(r=>r.kind==='boat').length,1);assert.ok(!JSON.stringify(data).includes(hashCode(code)));
+response=await api.POST(request({action:'declare',raceId:'race-power',outcome:'completed',compliant:true,submittedBy:'Test'},cookie));assert.equal(response.status,400);
+response=await api.POST(request({action:'declare',raceId:'race-irc',outcome:'completed',compliant:false,submittedBy:'Test'},cookie));assert.equal(response.status,400);
+response=await api.POST(request({action:'declare',raceId:'race-irc',outcome:'completed',compliant:true,submittedBy:'Test',boatId:'sail-1',status:'accepted'},cookie));assert.equal(response.status,200);data=await response.json();const declared=data.records.find(r=>r.kind==='declaration');assert.equal(declared.data.boatId,'sail-0');assert.equal(declared.data.status,'submitted');
+const boat=data.records.find(r=>r.kind==='boat');response=await api.POST(request({action:'crew',version:boat.version,skipper:'Updated skipper',crew:'Updated crew',publicTracking:true,tcc:2,boatId:'sail-1'},cookie));assert.equal(response.status,200);data=await response.json();assert.equal(data.records.find(r=>r.kind==='boat').data.tcc,boat.data.tcc);assert.notEqual(data.records.find(r=>r.kind==='boat').data.publicTracking,true);
+assert.equal((await api.POST(request({action:'crew',version:boat.version,skipper:'Stale',crew:''},cookie))).status,409);
+assert.equal((await api.POST(request({action:'arbitrary-write',kind:'payment'},cookie))).status,400);
+const access=globalThis.__eventTest.state.records.find(r=>r.kind==='crewaccess');globalThis.__eventTest.commit({...access,data:{...access.data,active:false}});
+assert.equal((await api.GET(new Request('https://race.example.test/api/competitor',{headers:{cookie}}))).status,401);
+delete globalThis.__eventTest;
+console.log('PASS: crew API login, secure cookies, origin protection, class validation, field restrictions, forced review, stale edits and immediate session revocation.');

@@ -1,13 +1,14 @@
 import { z } from 'zod';
+import { operationsSchemas } from './operations-model';
 import { extraSchemas,geometryText,webUrl } from './spectator-model';
 const str = z.string().trim().min(1).max(240);
 const short = z.string().trim().max(2000).default('');
 const discipline = z.enum(['sailing','powerboat']);
 const nonnegative = z.number().finite().min(0);
 export const schemas = {
- ...extraSchemas,
+ ...extraSchemas,...operationsSchemas,
  event: z.object({name:str,discipline,organiser:str,description:short}),
- boat: z.object({name:str,number:str,discipline,className:str,skipper:str,club:short,tcc:z.number().finite().min(0.1).max(3),crew:short,contact:short,berth:short,colour:z.string().regex(/^#[a-fA-F0-9]{6}$/),photoUrl:webUrl,publicSharing:z.boolean().default(true),checks:z.array(z.enum(['insurance','licence','briefing','equipment','scrutineering'])).default([]),status:z.enum(['entered','checked-in','withdrawn'])}),
+ boat: z.object({name:str,number:str,discipline,className:str,skipper:str,club:short,tcc:z.number().finite().min(0.1).max(3),crew:short,contact:short,berth:short,colour:z.string().regex(/^#[a-fA-F0-9]{6}$/),photoUrl:webUrl,publicSharing:z.boolean().default(true),publicTracking:z.boolean().default(false),checks:z.array(z.enum(['insurance','licence','briefing','equipment','scrutineering'])).default([]),status:z.enum(['entered','checked-in','withdrawn'])}),
  race: z.object({name:str,discipline,className:str,date:z.string().regex(/^\d{4}-\d{2}-\d{2}$/),start:z.string().regex(/^([01]\d|2[0-3]):[0-5]\d$/),status:z.enum(['scheduled','racing','postponed','finished','abandoned']),course:short,laps:z.number().int().min(1).max(100),scoring:z.enum(['IRC','elapsed','laps']),distance:nonnegative.max(1000),published:z.boolean().default(false),geometry:geometryText,geometrySource:z.enum(['illustrative','organiser']).default('illustrative')}),
  result: z.object({raceId:str,boatId:str,elapsed:nonnegative.max(604800),penalty:nonnegative.max(604800),laps:z.number().int().min(0).max(100),status:z.enum(['finished','DNS','DNF','DSQ','DNE','RDG']),note:short,pointsOverride:z.number().min(0).max(10000).optional(),nonDiscardable:z.boolean().default(false)}),
  notice: z.object({title:str,body:short,discipline:z.enum(['all','sailing','powerboat']),priority:z.enum(['info','important']),published:z.boolean().default(false),time:str}),
