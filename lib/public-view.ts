@@ -1,13 +1,16 @@
 import type { Entry } from './model';
 // Allow-list fields and record kinds. Never return the organiser snapshot or audit log.
 const fields:Record<string,string[]>={
+ shoreevent:['title','discipline','venueId','venue','date','start','end','category','audience','description','url'],communication:['title','body','discipline','className','audience','category','url','time'],forecast:['title','discipline','summary','detail','issuedAt','validUntil','official','source','url'],
  event:['name','discipline','description'],boat:['name','number','discipline','className','skipper','club','tcc','colour','status','photoUrl'],race:['name','discipline','className','date','start','status','course','laps','scoring','distance','published','geometry','geometrySource'],result:['raceId','boatId','elapsed','penalty','laps','status','pointsOverride','nonDiscardable'],track:['boatId','raceId','time','lat','lon','speed','heading'],notice:['title','body','discipline','priority','time'],sponsor:['name','tagline','logoUrl','website','placement','target','colour'],media:['title','type','url','body','discipline','raceId','time'],raceevent:['raceId','boatId','type','elapsed','title','body','published'],conditions:['discipline','windSpeed','windFrom','tideSpeed','tideDirection','tackAngle','source','sourceUrl','time'],series:['name','discipline','className','raceIds','discards','minimumRaces','published'],venue:['name','lat','lon','description','url'],
 };
-const publicationKinds=new Set(['notice','sponsor','media','raceevent','series','venue']);
+const publicationKinds=new Set(['notice','sponsor','media','raceevent','series','venue','shoreevent','communication','forecast']);
 export function publicProjection(records:Entry[]){
  const allowedBoats=new Set(records.filter(r=>r.kind==='boat'&&r.data.publicSharing!==false).map(r=>r.id));
  return records.flatMap(r=>{
   if(!fields[r.kind]||publicationKinds.has(r.kind)&&!(r.data as Record<string,unknown>).published)return [];
+  if((r.kind==='communication'||r.kind==='shoreevent')&&r.data.audience!=='everyone')return [];
+  if(r.kind==='track'&&!records.some(b=>b.kind==='boat'&&b.id===r.data.boatId&&b.data.publicTracking===true))return [];
   if(r.kind==='boat'&&!allowedBoats.has(r.id))return [];
   if(['track','result','raceevent'].includes(r.kind)&&((r.data as Record<string,unknown>).boatId)&&!allowedBoats.has(String((r.data as Record<string,unknown>).boatId)))return [];
   if(r.kind==='result'){const race=records.find(x=>x.id===r.data.raceId&&x.kind==='race') as Entry<'race'>|undefined;if(!race||!race.data.published)return [];}

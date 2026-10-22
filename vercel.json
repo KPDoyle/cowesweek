@@ -3,5 +3,13 @@
   "framework": "nextjs",
   "buildCommand": "pnpm run build:vercel",
   "installCommand": "pnpm install --frozen-lockfile",
-  "regions": ["lhr1"]
+  "regions": [
+    "lhr1"
+  ],
+  "crons": [
+    {
+      "path": "/api/club-delivery",
+      "schedule": "0 17 * * *"
+    }
+  ]
 }

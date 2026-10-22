@@ -26,13 +26,16 @@ export function applyOperations(state:EventState,raw:unknown,actor='Race office'
   if(op.delete){
    if(!existing)throw new EventError('Record no longer exists',409);
    if(op.kind==='event')throw new EventError('Events cannot be deleted');
-   if(records.some(r=>{const d=r.data as Record<string,unknown>;return r.id!==id&&[d.boatId,d.raceId].includes(id);}))throw new EventError('This record is in use. Remove its linked results, tracks or berth allocation first.');
+   if(records.some(r=>{const d=r.data as Record<string,unknown>;return r.id!==id&&[d.boatId,d.raceId,d.clubId,d.venueId].includes(id);}))throw new EventError('This record is in use. Remove its linked results, tracks or berth allocation first.');
    records=records.filter(r=>r.id!==id);
   }else{
    const parsed=schemas[op.kind].safeParse(op.data);if(!parsed.success)throw new EventError(parsed.error.issues.map(x=>`${x.path.join('.')}: ${x.message}`).join('; '));
    const d=parsed.data as Record<string,unknown>;
    if(d.boatId&&!records.some(r=>r.kind==='boat'&&r.id===d.boatId))throw new EventError('Choose an existing boat');
    if(d.raceId){const race=records.find(r=>r.kind==='race'&&r.id===d.raceId) as Entry<'race'>|undefined;if(!race)throw new EventError('Choose an existing race');const boat=records.find(r=>r.kind==='boat'&&r.id===d.boatId) as Entry<'boat'>|undefined;if(boat&&(race.data.discipline!==boat.data.discipline||race.data.className!==boat.data.className))throw new EventError('The boat must belong to the selected race class');}
+   if(d.clubId&&!records.some(r=>r.kind==='club'&&r.id===d.clubId))throw new EventError('Choose an existing yacht club');
+   if(d.venueId&&!records.some(r=>r.kind==='venue'&&r.id===d.venueId))throw new EventError('Choose an existing venue');
+   if(['declaration','crewaccess'].includes(op.kind)&&records.some(r=>r.kind===op.kind&&r.id!==id&&(r.data as Record<string,unknown>).boatId===d.boatId&&(op.kind!=='declaration'||(r.data as Record<string,unknown>).raceId===d.raceId)))throw new EventError('A record already exists. Edit the existing record.',409);
    if(op.kind==='series'){const ids=String(d.raceIds).split(',').map(v=>v.trim());if(!ids.length||new Set(ids).size!==ids.length||ids.some(id=>!records.some(r=>r.kind==='race'&&r.id===id&&r.data.discipline===d.discipline&&r.data.className===d.className)))throw new EventError('Choose unique existing races from the selected class.');}
    if(op.kind==='boat'&&d.status==='checked-in'&&!requiredChecks(String(d.discipline)).every(c=>(d.checks as string[]).includes(c)))throw new EventError('Complete the readiness checklist before check-in.');
    if(op.kind==='berth'&&((d.status==='available'&&d.boatId)||(d.status==='occupied'&&!d.boatId)))throw new EventError('Available berths must be unallocated; occupied berths need a boat.');

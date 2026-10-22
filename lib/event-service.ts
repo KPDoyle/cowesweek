@@ -36,6 +36,12 @@ function failure(e:unknown){
  if(e instanceof BlobPreconditionFailedError)return json({error:'Another edit was saved at the same time. Refresh and retry.'},409);
  console.error('Private event store request failed',e instanceof Error?e.name:'UnknownError');return json({error:'Unable to access saved event records. Please retry.'},503);
 }
+export async function commitOperations(body:unknown,actor='Race office'){
+ const current=await readStore(true);const next=applyOperations(current.state,body,actor);
+ const serialised=JSON.stringify(next);if(serialised.length>4000000)throw new EventError('The record store exceeds the current 4 MB limit. Export the records before adding more.',413);
+ await put(pathname,serialised,{access:'private',addRandomSuffix:false,allowOverwrite:true,ifMatch:current.etag,contentType:'application/json',cacheControlMaxAge:60,abortSignal:AbortSignal.timeout(25000)});
+ return next;
+}
 export async function GET(){if(process.env.COWES_PUBLIC_ONLY==='1')return json({error:'Organiser access is unavailable on the public site.'},403);try{return json(publicState((await readStore()).state));}catch(e){return failure(e);}}
 export async function POST(request:Request){
  if(process.env.COWES_PUBLIC_ONLY==='1')return json({error:'This site is read-only.'},403);
@@ -44,11 +50,7 @@ export async function POST(request:Request){
   if(Number(request.headers.get('content-length')||0)>2000000)return json({error:'Import exceeds 2 MB'},413);
   const raw=await request.text();if(raw.length>2000000)return json({error:'Import exceeds 2 MB'},413);
   let body:unknown;try{body=JSON.parse(raw);}catch{return json({error:'Invalid request JSON'},400);}
-  const current=await readStore(true);const next=applyOperations(current.state,body);
-  const serialised=JSON.stringify(next);if(serialised.length>4000000)throw new EventError('The record store exceeds the current 4 MB limit. Export the records before adding more.',413);
-  // Conditional writes are atomic at the object store. Stale concurrent writes
-  // fail with 409 rather than dropping someone else's update or its audit entry.
-  await put(pathname,serialised,{access:'private',addRandomSuffix:false,allowOverwrite:true,ifMatch:current.etag,contentType:'application/json',cacheControlMaxAge:60,abortSignal:AbortSignal.timeout(25000)});
+  const next=await commitOperations(body);
   return json(publicState(next));
  }catch(e){return failure(e);}
 }

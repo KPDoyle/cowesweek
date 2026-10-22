@@ -41,3 +41,9 @@ Seeded boats, crews, races, results and conditions are fictional. Official track
 Node 22.13+ and pnpm: `pnpm install`, `pnpm dev`, `pnpm build`, `pnpm test`.
 
 Tests cover private persistence, validation, atomic edits, concurrency, preview isolation, public redaction/sharing, saved geometry, UK start times, shared-clock GPS, provisional order, replay, manoeuvres, dead heats, discards, DNE, series ties, CSV portability and 1,000-boat calculation performance. Map clustering reduces visible markers for dense fleets. Browser and production API checks accompany deployment.
+
+## Regatta operations update
+
+Open **Regatta operations** in the office rail, or `/office?view=operations`, for entries import, payment ledger, declarations, automated club results/prize packs, shoreside schedules, targeted communications, official forecasts, benefits, registration codes and all-fleet tracking coverage. `/hub` offers role selection; `/crew` is the boat-code protected competitor portal. GPS locations are private unless the office explicitly approves public tracking separately from the boat profile.
+
+See [the operational review and connection guide](docs/OPERATIONS.md) for coverage, scheduled email gateway configuration and verification limits. New workflows require no production data migration.
